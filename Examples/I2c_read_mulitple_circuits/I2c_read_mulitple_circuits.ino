@@ -1,4 +1,4 @@
-#include <Ezo_i2c.h> //include the EZO I2C library (insert site where it comes from)
+#include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
 Ezo_board PH = Ezo_board(99, "PH");       //create a PH circuit object, who's address is 99 and name is "PH"
