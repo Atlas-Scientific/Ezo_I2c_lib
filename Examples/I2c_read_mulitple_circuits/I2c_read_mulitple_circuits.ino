@@ -14,7 +14,7 @@ void setup() {
   Serial.begin(115200);                   //start the serial communication to the computer
 }
 
-void receive_reading(Ezo_board Sensor) {               // function to decode the reading after the read command was issued
+void receive_reading(Ezo_board &Sensor) {               // function to decode the reading after the read command was issued
   
   Serial.print(Sensor.get_name()); Serial.print(": "); // print the name of the circuit getting the reading
   
