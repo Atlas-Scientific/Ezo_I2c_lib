@@ -82,18 +82,23 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
   }
   
   //should last array point be set to 0 to stop string overflows?
-
   switch (code) {
     case 1:
-      return SUCCESS;
+	  this->error = SUCCESS;
+      break;
 
     case 2:
-      return FAIL;
+	  this->error = FAIL;
+      break;
 
     case 254:
-      return NOT_READY;
+	  this->error = NOT_READY;
+      break;
 
     case 255:
-      return NO_DATA;
+	  this->error = NO_DATA;
+	  break;
   }
+  return this->error;
+
 }
