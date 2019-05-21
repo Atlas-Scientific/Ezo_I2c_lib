@@ -29,6 +29,18 @@ void Ezo_board::send_read(){
 	this->issued_read = true;
 }
 
+void Ezo_board::send_cmd_with_num(const char* cmd, float num, uint8_t decimal_amount){
+	String temp = String(cmd )+ String(num, decimal_amount);
+	const char* pointer = temp.c_str();
+	send_cmd(pointer);
+}
+
+void Ezo_board::send_read_with_temp_comp(float temperature){
+	send_cmd_with_num("rt,", temperature, 3);
+	this->issued_read = true;
+}
+
+
 enum Ezo_board::errors Ezo_board::receive_read(){
 	
 	char _sensordata[this->bufferlen];
@@ -67,12 +79,12 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
   Wire.requestFrom(this->i2c_address, (uint8_t)(buffer_len-1), (uint8_t)1);
   code = Wire.read();
 
-  Wire.beginTransmission(this->i2c_address);
+  //Wire.beginTransmission(this->i2c_address);
   while (Wire.available()) {
     in_char = Wire.read();
 
     if (in_char == 0) {
-      Wire.endTransmission();
+      //Wire.endTransmission();
       break;
     }
     else {
@@ -100,5 +112,5 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
 	  break;
   }
   return this->error;
-
+  
 }
