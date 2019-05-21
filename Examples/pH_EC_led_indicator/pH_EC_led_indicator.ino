@@ -1,12 +1,11 @@
-/*This code allows you to monitor in real-time, pH and EC. You can modify it to observe other parameters such as DO, temperature and ORP.  It works 
+/*This code was written for the Instructable "MAKE YOUR OWN PH-EC MONITOR WITH LED INDICATORS" (Link: https://www.instructables.com/id/MAKE-YOUR-OWN-PH-EC-MONITOR-WITH-LED-INDICATORS/)
+Testing was done using an Arduino UNO.
+The code allows you to monitor in real-time, pH and EC. You can modify it to observe other parameters such as DO, temperature and ORP.  It works 
 with Atlas Scientific's EZO circuits. The sensors must be calibrated and switched to I2C mode before using this code as it does not have the capability 
 of allowing the user to send commands to the circuits. The readings of the sensors are displayed on the Arduino serial monitor. 
 There are two LEDs which functions as a warning system. They are turned on when the readings go out of the defined limits.
 These LEDs offer a simple demonstration of how you can utilize sensor readings to trigger other hardware.
-Once you have uploaded the code to your Arduino, open the serial monitor, set the baud rate to 115200 and append "Carriage return"
-This code was tested on an Arduino UNO. 
-It was written for the instructable "MAKE YOUR OWN PH-EC MONITOR WITH LED INDICATORS" (Link: https://www.instructables.com/id/MAKE-YOUR-OWN-PH-EC-MONITOR-WITH-LED-INDICATORS/)
-*/
+Once you have uploaded the code to your Arduino, open the serial monitor, set the baud rate to 115200 and append "Carriage return"*/
 
 #include <Ezo_i2c.h> //include the EZO I2C library (EZO_i2c.h is customized header file for Atlas Scientific's EZO circuits in I2C mode. Link: https://github.com/Atlas-Scientific/Ezo_I2c_lib)
 #include <Wire.h>    //include arduinos i2c library
