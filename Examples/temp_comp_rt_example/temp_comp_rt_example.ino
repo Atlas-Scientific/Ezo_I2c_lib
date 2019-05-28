@@ -1,7 +1,7 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
-Ezo_board PH = Ezo_board(99, "PH");       //create a PH circuit object, who's address is 99 and name is "PH"
+Ezo_board EC = Ezo_board(100, "EC");       //create a PH circuit object, who's address is 99 and name is "PH"
 Ezo_board RTD = Ezo_board(102, "RTD");      //create an RTD circuit object who's address is 102 and name is "RTD"
 
 bool reading_request_phase = true;        //selects our phase
@@ -45,9 +45,9 @@ void loop() {
     //send a read command. we use this command instead of PH.send_cmd("R");
     //to let the library know to parse the reading
     if((RTD.get_error() == Ezo_board::SUCCESS) && (RTD.get_reading() > -1000.0)){
-      PH.send_read_with_temp_comp(RTD.get_reading());
+      EC.send_read_with_temp_comp(RTD.get_reading());
     }else{
-       PH.send_read_with_temp_comp(25.0);
+       EC.send_read_with_temp_comp(25.0);
     }
     RTD.send_read();
 
@@ -57,7 +57,7 @@ void loop() {
   else {                               //if were in the receiving phase
     if (millis() >= next_poll_time) {  //and its time to get the response
 
-      receive_reading(PH);             //get the reading from the PH circuit
+      receive_reading(EC);             //get the reading from the PH circuit
       Serial.print("  ");
       receive_reading(RTD);             //get the reading from the RTD circuit
       Serial.println();
