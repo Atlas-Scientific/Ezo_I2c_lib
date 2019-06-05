@@ -1,7 +1,7 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
-Ezo_board EC = Ezo_board(100, "EC");       //create a PH circuit object, who's address is 99 and name is "PH"
+Ezo_board EC = Ezo_board(100, "EC");       //create a EC circuit object, who's address is 100 and name is "EC"
 Ezo_board RTD = Ezo_board(102, "RTD");      //create an RTD circuit object who's address is 102 and name is "RTD"
 
 bool reading_request_phase = true;        //selects our phase
