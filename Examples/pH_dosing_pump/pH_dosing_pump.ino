@@ -1,4 +1,5 @@
-/*This code was written for the Instructable "DIY PH DOSING PUMP" (Link:https://www.instructables.com/id/DIY-PH-DOSING-PUMP/)
+/*This code was written for the Instructable "DIY PH DOSING PUMP" (Link:https://www.instructables.com/id/DIY-PH-DOSING-PUMP/) 
+  and hackster.io "DIY pH Dosing Pump" (Link: https://www.hackster.io/atlas-scientific/diy-ph-dosing-pump-061cef)
   It was tested on an Arduino UNO.
   Real time pH monitoring is done using the EZO pH sensor and two EZO PMP. The pumps dispense pH UP and pH DOWN solutions into the sample and they are triggered in accordance with the current pH reading.
   The goal is to maintain the pH level of the sample between 8 and 8.5
