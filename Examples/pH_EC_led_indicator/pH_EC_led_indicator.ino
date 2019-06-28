@@ -1,4 +1,5 @@
-/*This code was written for the Instructable "MAKE YOUR OWN PH-EC MONITOR WITH LED INDICATORS" (Link: https://www.instructables.com/id/MAKE-YOUR-OWN-PH-EC-MONITOR-WITH-LED-INDICATORS/)
+/*This code was written for the Instructable "MAKE YOUR OWN PH AND SALINITY MONITORING SYSTEM WITH LED INDICATORS" (Link: https://www.instructables.com/id/MAKE-YOUR-OWN-PH-EC-MONITOR-WITH-LED-INDICATORS/)
+and hackster.io "Make Your Own pH and Salinity Monitoring System" (Link: https://www.hackster.io/atlas-scientific/make-your-own-ph-and-salinity-monitoring-system-fb14c1)
 Testing was done using an Arduino UNO.
 The code allows you to monitor in real-time, pH and EC. You can modify it to observe other parameters such as DO, temperature and ORP.  It works 
 with Atlas Scientific's EZO circuits. The sensors must be calibrated and switched to I2C mode before using this code as it does not have the capability 
