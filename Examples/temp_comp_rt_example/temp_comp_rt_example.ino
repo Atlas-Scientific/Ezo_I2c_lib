@@ -9,6 +9,9 @@ bool reading_request_phase = true;        //selects our phase
 uint32_t next_poll_time = 0;              //holds the next time we receive a response, in milliseconds
 const unsigned int response_delay = 1000; //how long we wait to receive a response, in milliseconds
 
+float ec;         //used to hold floating point number that is ec
+float temp;       //used to hold floating point number that is temperature
+
 void setup() {
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                   //start the serial communication to the computer
@@ -22,6 +25,10 @@ void receive_reading(Ezo_board &Sensor) {               // function to decode th
 
   switch (Sensor.get_error()) {             //switch case based on what the response code is.
     case Ezo_board::SUCCESS:
+      /*                                                            //uncomment this section for access to sensor readings
+      if (Sensor.get_name()=="EC"){ec = Sensor.get_reading();}      //the EC readings are now stored in a float
+      if (Sensor.get_name()=="RTD"){temp = Sensor.get_reading();}   //the temperature readings are now stored in a float
+      */
       Serial.print(Sensor.get_reading(), 3);  //the command was successful, print the reading
       break;
 
