@@ -6,7 +6,7 @@ with Atlas Scientific's EZO circuits. The sensors must be calibrated and switche
 of allowing the user to send commands to the circuits. The readings of the sensors are displayed on the Arduino serial monitor. 
 There are two LEDs which functions as a warning system. They are turned on when the readings go out of the defined limits.
 These LEDs offer a simple demonstration of how you can utilize sensor readings to trigger other hardware.
-Once you have uploaded the code to your Arduino, open the serial monitor, set the baud rate to 115200 and append "Carriage return"*/
+Once you have uploaded the code to your Arduino, open the serial monitor, set the baud rate to 9600 and append "Carriage return"*/
 
 #include <Ezo_i2c.h> //include the EZO I2C library (EZO_i2c.h is customized header file for Atlas Scientific's EZO circuits in I2C mode. Link: https://github.com/Atlas-Scientific/Ezo_I2c_lib)
 #include <Wire.h>    //include arduinos i2c library
