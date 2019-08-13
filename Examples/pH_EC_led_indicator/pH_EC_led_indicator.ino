@@ -23,7 +23,7 @@ const unsigned int response_delay = 1000; //how long we wait to receive a respon
 
 void setup() {
   Wire.begin();                           //start the I2C
-  Serial.begin(115200);                   //start the serial communication to the computer at baud rate of 115200
+  Serial.begin(9600);                     //start the serial communication to the computer at baud rate of 9600
   pinMode(PH_led, OUTPUT);                //set pin of pH led as output
   pinMode(EC_led, OUTPUT);                //set pin for EC led as output
 }
