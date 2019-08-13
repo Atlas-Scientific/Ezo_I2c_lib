@@ -13,7 +13,7 @@ const unsigned int temp_delay = 300;
 
 void setup() {
   Wire.begin();                           //start the I2C
-  Serial.begin(115200);                   //start the serial communication to the computer
+  Serial.begin(9600);                     //start the serial communication to the computer
 }
 
 void receive_reading(Ezo_board &Sensor) {               // function to decode the reading after the read command was issued
