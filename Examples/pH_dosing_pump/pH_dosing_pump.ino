@@ -4,7 +4,7 @@
   Real time pH monitoring is done using the EZO pH sensor and two EZO PMP. The pumps dispense pH UP and pH DOWN solutions into the sample and they are triggered in accordance with the current pH reading.
   The goal is to maintain the pH level of the sample between 8 and 8.5
   The sensors must be calibrated and switched to I2C mode before using this code. The ability to send commands to the sensors is not incorporated here.
-  After uploading the code to your arduino, open the serial monitor, set the baud rate to 115200 and select "Carriage return". The pH dosing system is now active.*/
+  After uploading the code to your arduino, open the serial monitor, set the baud rate to 9600 and select "Carriage return". The pH dosing system is now active.*/
 
 
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
@@ -21,7 +21,7 @@ const unsigned int response_delay = 1000;                      //how long we wai
 
 void setup() {
   Wire.begin();                                                //start the I2C
-  Serial.begin(115200);                                        //start the serial communication to the computer
+  Serial.begin(9600);                                          //start the serial communication to the computer
 }
 
 void receive_reading(Ezo_board &Sensor) {                      // function to decode the reading after the read command was issued
