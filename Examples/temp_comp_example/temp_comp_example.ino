@@ -72,7 +72,7 @@ void loop() {
 
     case RESPONSE:                             //if were in the receiving phase
       if (millis() >= next_poll_time) {  //and its time to get the response
-        receive_reading(EC);             //get the reading from the PH circuit
+        receive_reading(EC);             //get the reading from the EC circuit
         Serial.print("  ");
         receive_reading(RTD);             //get the reading from the RTD circuit
         Serial.println();
