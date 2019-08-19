@@ -49,7 +49,7 @@ void receive_reading(Ezo_board &Sensor) {               // function to decode th
 void loop() {
   if (reading_request_phase) {           //if were in the phase where we ask for a reading
 
-    //send a read command. we use this command instead of PH.send_cmd("R");
+    //send a read command. we use this command instead of EC.send_cmd("R");
     //to let the library know to parse the reading
     if((RTD.get_error() == Ezo_board::SUCCESS) && (RTD.get_reading() > -1000.0)){
       EC.send_read_with_temp_comp(RTD.get_reading());
