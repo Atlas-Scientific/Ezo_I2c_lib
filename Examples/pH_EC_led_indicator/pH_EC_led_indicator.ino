@@ -28,15 +28,53 @@ void setup() {
   pinMode(EC_led, OUTPUT);                //set pin for EC led as output
 }
 
+
+void loop() {
+  if (reading_request_phase) {                          //if were in the phase where we ask for a reading
+
+    //send a read command. we use this command instead of PH.send_cmd("R");
+    //to let the library know to parse the reading
+    PH.send_read_cmd();
+    EC.send_read_cmd();
+
+    next_poll_time = millis() + response_delay;         //set when the response will arrive
+    reading_request_phase = false;                      //switch to the receiving phase
+  }
+  else {                                                //if were in the receiving phase
+    if (millis() >= next_poll_time) {                   //and its time to get the response
+
+      receive_reading(PH);                              //get the reading from the PH circuit
+      if(PH.get_last_received_reading() > 10) {                       //test condition against pH reading
+        digitalWrite(PH_led,HIGH);                      //if condition true, led on
+      }
+      else{
+        digitalWrite(PH_led,LOW);                       //if condition false, led off
+      }
+      Serial.print("  ");
+
+      receive_reading(EC);                              //get the reading from the EC circuit
+      if (EC.get_last_received_reading() > 500.00) {                  //test condition against EC reading
+        digitalWrite(EC_led,HIGH);                      //if condition true, led on
+      }
+       else{
+        digitalWrite(EC_led,LOW);                       //if condition false, led off
+       }    
+      Serial.println();
+
+      reading_request_phase = true;                     //switch back to asking for readings
+    }
+  }
+}
+
 void receive_reading(Ezo_board &Sensor) {               // function to decode the reading after the read command was issued
 
   Serial.print(Sensor.get_name()); Serial.print(": ");  // print the name of the circuit getting the reading
 
-  Sensor.receive_read();                                //get the response data and put it into the [Sensor].reading variable if successful
+  Sensor.receive_read_cmd();                                //get the response data and put it into the [Sensor].reading variable if successful
 
   switch (Sensor.get_error()) {                         //switch case based on what the response code is.
     case Ezo_board::SUCCESS:
-      Serial.print(Sensor.get_reading());               //the command was successful, print the reading
+      Serial.print(Sensor.get_last_received_reading());               //the command was successful, print the reading
       break;
 
     case Ezo_board::FAIL:
@@ -50,43 +88,6 @@ void receive_reading(Ezo_board &Sensor) {               // function to decode th
     case Ezo_board::NO_DATA:
       Serial.print("No Data ");                         //the sensor has no data to send.
       break;
-  }
-}
-
-void loop() {
-  if (reading_request_phase) {                          //if were in the phase where we ask for a reading
-
-    //send a read command. we use this command instead of PH.send_cmd("R");
-    //to let the library know to parse the reading
-    PH.send_read();
-    EC.send_read();
-
-    next_poll_time = millis() + response_delay;         //set when the response will arrive
-    reading_request_phase = false;                      //switch to the receiving phase
-  }
-  else {                                                //if were in the receiving phase
-    if (millis() >= next_poll_time) {                   //and its time to get the response
-
-      receive_reading(PH);                              //get the reading from the PH circuit
-      if(PH.get_reading() > 10) {                       //test condition against pH reading
-        digitalWrite(PH_led,HIGH);                      //if condition true, led on
-      }
-      else{
-        digitalWrite(PH_led,LOW);                       //if condition false, led off
-      }
-      Serial.print("  ");
-
-      receive_reading(EC);                              //get the reading from the EC circuit
-      if (EC.get_reading() > 500.00) {                  //test condition against EC reading
-        digitalWrite(EC_led,HIGH);                      //if condition true, led on
-      }
-       else{
-        digitalWrite(EC_led,LOW);                       //if condition false, led off
-       }    
-      Serial.println();
-
-      reading_request_phase = true;                     //switch back to asking for readings
-    }
   }
 }
 

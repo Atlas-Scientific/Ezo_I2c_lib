@@ -24,7 +24,7 @@ void Ezo_board::send_cmd(const char* command) {
   this->issued_read = false;
 }
 
-void Ezo_board::send_read(){
+void Ezo_board::send_read_cmd(){
 	send_cmd("r");
 	this->issued_read = true;
 }
@@ -41,7 +41,7 @@ void Ezo_board::send_read_with_temp_comp(float temperature){
 }
 
 
-enum Ezo_board::errors Ezo_board::receive_read(){
+enum Ezo_board::errors Ezo_board::receive_read_cmd(){
 	
 	char _sensordata[this->bufferlen];
 	this->error = receive_cmd(_sensordata, bufferlen);
@@ -61,7 +61,7 @@ bool Ezo_board::is_read_poll(){
 	return this->issued_read;
 }
 
-float Ezo_board::get_reading(){
+float Ezo_board:: get_last_received_reading(){  
 	return this->reading;
 }
 

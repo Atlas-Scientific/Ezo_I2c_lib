@@ -14,38 +14,15 @@ void setup() {
   Serial.begin(9600);                   //start the serial communication to the computer
 }
 
-void receive_reading(Ezo_board &Sensor) {               // function to decode the reading after the read command was issued
-  
-  Serial.print(Sensor.get_name()); Serial.print(": "); // print the name of the circuit getting the reading
-  
-  Sensor.receive_read();              //get the response data and put it into the [Sensor].reading variable if successful
-                                      
-  switch (Sensor.get_error()) {             //switch case based on what the response code is.
-    case Ezo_board::SUCCESS:        
-      Serial.print(Sensor.get_reading());   //the command was successful, print the reading
-      break;
 
-    case Ezo_board::FAIL:          
-      Serial.print("Failed ");        //means the command has failed.
-      break;  
-
-    case Ezo_board::NOT_READY:      
-      Serial.print("Pending ");       //the command has not yet been finished calculating.
-      break;
-
-    case Ezo_board::NO_DATA:      
-      Serial.print("No Data ");       //the sensor has no data to send.
-      break;
-  }
-}
 
 void loop() {
   if (reading_request_phase) {           //if were in the phase where we ask for a reading
 
     //send a read command. we use this command instead of PH.send_cmd("R"); 
     //to let the library know to parse the reading
-    PH.send_read();                      
-    EC.send_read();
+    PH.send_read_cmd();                      
+    EC.send_read_cmd();
     
     next_poll_time = millis() + response_delay; //set when the response will arrive
     reading_request_phase = false;       //switch to the receiving phase
@@ -60,5 +37,30 @@ void loop() {
 
       reading_request_phase = true;            //switch back to asking for readings
     }
+  }
+}
+
+void receive_reading(Ezo_board &Sensor) {               // function to decode the reading after the read command was issued
+  
+  Serial.print(Sensor.get_name()); Serial.print(": "); // print the name of the circuit getting the reading
+  
+  Sensor.receive_read_cmd();              //get the response data and put it into the [Sensor].reading variable if successful
+                                      
+  switch (Sensor.get_error()) {             //switch case based on what the response code is.
+    case Ezo_board::SUCCESS:        
+      Serial.print(Sensor.get_last_received_reading());   //the command was successful, print the reading
+      break;
+
+    case Ezo_board::FAIL:          
+      Serial.print("Failed ");        //means the command has failed.
+      break;  
+
+    case Ezo_board::NOT_READY:      
+      Serial.print("Pending ");       //the command has not yet been finished calculating.
+      break;
+
+    case Ezo_board::NO_DATA:      
+      Serial.print("No Data ");       //the sensor has no data to send.
+      break;
   }
 }

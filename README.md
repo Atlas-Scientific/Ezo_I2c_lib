@@ -22,7 +22,7 @@ Ezo_board(uint8_t address, const char* name);
 void send_cmd(const char* command);	
 //send any command in a string, see the devices datasheet for available i2c commands
 
-void send_read();	
+void send_read_cmd();	
 //sends the "R" command to the device and sets issued_read() to true, 
 //so we know to parse the data when we receive it with receive_read()
 
@@ -40,7 +40,7 @@ enum errors receive_cmd(char* sensordata_buffer, uint8_t buffer_len);
 //Buffer should be long enough to hold the longest command 
 //you'll receive. We recommand 32 bytes/chars as a default
 
-enum errors receive_read(); 
+enum errors receive_read_cmd(); 
 //gets the read response from the device, and parses it into the reading variable
 //if send_read() wasn't used to send the "R" command and issued_read() isnt set, the function will 
 //return the "NOT_READ_CMD" error
@@ -50,7 +50,7 @@ bool is_read_poll();
 //Useful for determining if we should call receive_read() (if is_read_poll() returns true) 
 //or recieve_cmd() if is_read_poll() returns false) 
 
-float get_reading();		
+float get_last_received_reading();		
 //returns the last reading the device received as a float
 
 const char* get_name();		
