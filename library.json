@@ -1,0 +1,31 @@
+{
+  "name": "EZO I2C Sensors",
+  "keywords": "ezo, i2c, ph, ec, sensor",
+  "description": "Interface with the EZO pH and EC sensors over I2C",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:protohaus/Ezo_I2c_lib.git"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Atlas Scientific",
+      "email": "Info@Atlas-Scientific.com",
+      "url": "https://www.atlas-scientific.com/",
+      "maintainer": false
+    },
+    {
+      "name": "Moritz Ulmer",
+      "email": "moritz.ulmer@posteo.de",
+      "url": "https://www.protohaus.org",
+      "maintainer": true
+    }
+  ],
+  "version": "32e1eda",
+  "frameworks": "arduino",
+  "platforms": [
+    "espressif8266",
+    "espressif32",
+    "atmelavr"
+  ]
+}
