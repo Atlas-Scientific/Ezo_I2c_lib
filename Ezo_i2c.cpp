@@ -17,6 +17,10 @@ const char* Ezo_board::get_name(){
 	return this->name;
 }
 
+uint8_t Ezo_board::get_address(){
+    return i2c_address;
+}
+
 void Ezo_board::send_cmd(const char* command) {
   Wire.beginTransmission(this->i2c_address);
   Wire.write(command); 

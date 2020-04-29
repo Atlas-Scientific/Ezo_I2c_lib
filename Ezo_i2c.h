@@ -83,6 +83,10 @@ class Ezo_board{
 	//returns the error status of the last received command, 
 	//used to check the validity of the data returned by get_reading()
 	
+    uint8_t get_address();
+    //returns the address of the device
+    
+    
 	protected:
 	uint8_t i2c_address;
 	const char* name = 0;
