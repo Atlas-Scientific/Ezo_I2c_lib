@@ -56,6 +56,9 @@ float get_last_received_reading();
 const char* get_name();		
 //returns a pointer to the name string
 
+uint8_t get_address();
+//returns the address of the device
+
 enum errors get_error();	
 //returns the error status of the last received command, 
 //used to check the validity of the data returned by get_reading()
