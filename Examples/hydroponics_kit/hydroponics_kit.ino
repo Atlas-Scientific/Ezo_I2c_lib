@@ -402,7 +402,7 @@ void print_help() {
   Serial.println(F("                                                                           "));
   Serial.println(F("ec:cal,dry           calibrate a dry EC probe                              "));
   Serial.println(F("ec:cal,low,12880     calibrate EC probe to 12,880us                        "));
-  Serial.println(F("ec:cal,low,80000     calibrate EC probe to 80,000us                        "));
+  Serial.println(F("ec:cal,high,80000    calibrate EC probe to 80,000us                        "));
   Serial.println(F("ec:cal,clear         clear calibration                                     "));
   Serial.println(F("                                                                           "));
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
