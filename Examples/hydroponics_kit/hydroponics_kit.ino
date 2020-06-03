@@ -63,7 +63,7 @@ void setup() {
   pinMode(EN_EC, OUTPUT);
   pinMode(EN_RTD, OUTPUT);
   pinMode(EN_AUX, OUTPUT);
-  digitalWrite(EN_PH, LOW);                                                       //set enable pins LOW to enable the circuits
+  digitalWrite(EN_PH, LOW);                                                       //set enable pins to enable the circuits
   digitalWrite(EN_EC, LOW);
   digitalWrite(EN_RTD, HIGH);
   digitalWrite(EN_AUX, LOW);
