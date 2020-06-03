@@ -27,6 +27,7 @@ Ezo_board device_list[] = {
 //enable pins for each circuit
 const int EN_PH = 14;
 const int EN_EC = 12;
+const int EN_RTD = 15;
 const int EN_AUX = 13;
 
 Ezo_board* default_board = &device_list[0]; //used to store the board were talking to
@@ -60,9 +61,11 @@ void setup() {
 
   pinMode(EN_PH, OUTPUT);                                                         //set enable pins as outputs
   pinMode(EN_EC, OUTPUT);
+  pinMode(EN_RTD, OUTPUT);
   pinMode(EN_AUX, OUTPUT);
   digitalWrite(EN_PH, LOW);                                                       //set enable pins LOW to enable the circuits
   digitalWrite(EN_EC, LOW);
+  digitalWrite(EN_RTD, HIGH);
   digitalWrite(EN_AUX, LOW);
 
   Wire.begin();                           //start the I2C
