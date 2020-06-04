@@ -63,7 +63,7 @@ void setup() {
   pinMode(EN_EC, OUTPUT);
   pinMode(EN_RTD, OUTPUT);
   pinMode(EN_AUX, OUTPUT);
-  digitalWrite(EN_PH, LOW);                                                       //set enable pins LOW to enable the circuits
+  digitalWrite(EN_PH, LOW);                                                       //set enable pins to enable the circuits
   digitalWrite(EN_EC, LOW);
   digitalWrite(EN_RTD, HIGH);
   digitalWrite(EN_AUX, LOW);
@@ -391,7 +391,7 @@ void receive_reading(Ezo_board &Device) {              // function to decode the
 }
 
 void print_help() {
-  Serial.println(F("Atlas Scientific I2C hydroponics kit (Atlas Scientific I2C pool kit)       "));
+  Serial.println(F("Atlas Scientific I2C hydroponics kit                                       "));
   Serial.println(F("Commands:                                                                  "));
   Serial.println(F("datalog      Takes readings of all sensors every 15 sec send to thingspeak "));
   Serial.println(F("             Entering any commands stops datalog mode.                     "));
