@@ -396,8 +396,7 @@ void print_help() {
   Serial.println(F("ph:cal,high,10   calibrate to pH 10                                        "));
   Serial.println(F("ph:cal,clear     clear calibration                                         "));
   Serial.println(F("                                                                           "));
-  Serial.println(F("orp:cal,n            calibrate a the orp probe to any value                "));
-  Serial.println(F("                     n= the orp value you have chosen                      "));
+  Serial.println(F("orp:cal,225          calibrate orp probe to 225mV                          "));
   Serial.println(F("orp:cal,clear        clear calibration                                     ")); 
   Serial.println(F("                                                                           "));
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
