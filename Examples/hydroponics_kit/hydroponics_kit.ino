@@ -146,11 +146,11 @@ void loop() {
           if ((RTD.get_error() == Ezo_board::SUCCESS) && (RTD.get_last_received_reading() > -1000.0)) { //if the temperature reading has been received and it is valid
             PH.send_cmd_with_num("T,", RTD.get_last_received_reading());
             EC.send_cmd_with_num("T,", RTD.get_last_received_reading());
-            ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                 //assign temperature readings to the first column of thingspeak channel
+            ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                 //assign temperature readings to the third column of thingspeak channel
           } else {                                                                                      //if the temperature reading is invalid
             PH.send_cmd_with_num("T,", 25.0);
             EC.send_cmd_with_num("T,", 25.0);                                                          //send default temp = 25 deg C to EC sensor
-            ThingSpeak.setField(3, String(25.0, 2));                 //assign temperature readings to the first column of thingspeak channel
+            ThingSpeak.setField(3, String(25.0, 2));                 //assign temperature readings to the third column of thingspeak channel
           }
 
           Serial.print(" ");
@@ -178,12 +178,12 @@ void loop() {
 
           receive_reading(PH);             //get the reading from the PH circuit
           if (PH.get_error() == Ezo_board::SUCCESS) {                                          //if the PH reading was successful (back in step 1)
-            ThingSpeak.setField(1, String(PH.get_last_received_reading(), 2));                 //assign temperature readings to the first column of thingspeak channel
+            ThingSpeak.setField(1, String(PH.get_last_received_reading(), 2));                 //assign PH readings to the first column of thingspeak channel
           }
           Serial.print("  ");
           receive_reading(EC);             //get the reading from the EC circuit
           if (EC.get_error() == Ezo_board::SUCCESS) {                                          //if the EC reading was successful (back in step 1)
-            ThingSpeak.setField(2, String(EC.get_last_received_reading(), 0));                 //assign temperature readings to the second column of thingspeak channel
+            ThingSpeak.setField(2, String(EC.get_last_received_reading(), 0));                 //assign EC readings to the second column of thingspeak channel
           }
           Serial.println();
 
@@ -307,7 +307,7 @@ void user_commands() {
 
     int16_t index = serial_receive.indexOf(',');                    //check if were passing a polling delay parameter
     if (index != -1) {                                              //if there is a polling delay
-      float new_delay = serial_receive.substring(index + 1).toFloat(); //turn it into a flaot
+      float new_delay = serial_receive.substring(index + 1).toFloat(); //turn it into a float
       if (new_delay >= 1.0) {                                       //make sure its greater than our minimum time
         poll_delay = (new_delay * 1000.0) - reading_delay;          //convert to milliseconds and remove the reading delay from our wait
       } else {
