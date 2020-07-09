@@ -6,10 +6,10 @@
 WiFiClient  client;                                              //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
 
 //----------------Fill in your Wi-Fi / ThingSpeak Credentials-------
-const String ssid = "Wifi Name";                                 //The name of the Wi-Fi network you are connecting to
-const String pass = "Wifi Password";                             //Your WiFi network password
-const long myChannelNumber = NNNNNNN;                            //Your Thingspeak channel number
-const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";                 //Your ThingSpeak Write API Key
+//const String ssid = "Wifi Name";                                 //The name of the Wi-Fi network you are connecting to
+//const String pass = "Wifi Password";                             //Your WiFi network password
+//const long myChannelNumber = NNNNNNN;                            //Your Thingspeak channel number
+//const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";                 //Your ThingSpeak Write API Key
 //------------------------------------------------------------------
 
 
