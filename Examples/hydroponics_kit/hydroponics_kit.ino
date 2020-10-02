@@ -57,6 +57,8 @@ const unsigned long thingspeak_delay = 15000;                                   
 const unsigned long short_delay = 300;              //how long we wait for most commands and queries
 const unsigned long long_delay = 1200;              //how long we wait for commands like cal and R (see datasheets for which commands have longer wait times)
 
+float k_val = 0;                                    //holds the k value of the ec circuit
+
 void setup() {
 
   pinMode(EN_PH, OUTPUT);                                                         //set enable pins as outputs
@@ -380,6 +382,14 @@ void print_error_type(Ezo_board &Device, const char* success_string) {
   }
 }
 
+void get_ec_k_value(){                                    //function to query the value of the ec circuit
+  char rx_buf[10];                                        //buffer to hold the string we receive from the circuit
+  EC.send_cmd("k,?");                                     //query the k value
+  delay(300);
+  if(EC.receive_cmd(rx_buf, 10) == Ezo_board::SUCCESS){   //if the reading is successful
+    k_val = String(rx_buf).substring(3).toFloat();        //parse the reading into a float
+  }
+}
 
 void receive_reading(Ezo_board &Device) {              // function to decode the reading after the read command was issued
 
@@ -391,6 +401,7 @@ void receive_reading(Ezo_board &Device) {              // function to decode the
 }
 
 void print_help() {
+  get_ec_k_value();
   Serial.println(F("Atlas Scientific I2C hydroponics kit                                       "));
   Serial.println(F("Commands:                                                                  "));
   Serial.println(F("datalog      Takes readings of all sensors every 15 sec send to thingspeak "));
@@ -402,12 +413,27 @@ void print_help() {
   Serial.println(F("ph:cal,high,10   calibrate to pH 10                                        "));
   Serial.println(F("ph:cal,clear     clear calibration                                         "));
   Serial.println(F("                                                                           "));
-  Serial.println(F("                                                                           "));
   Serial.println(F("ec:cal,dry           calibrate a dry EC probe                              "));
-  Serial.println(F("ec:cal,low,12880     calibrate EC probe to 12,880us                        "));
-  Serial.println(F("ec:cal,high,80000    calibrate EC probe to 80,000us                        "));
+  Serial.println(F("ec:k,[n]             used to switch K values, standard probes values are 0.1, 1, and 10 "));
   Serial.println(F("ec:cal,clear         clear calibration                                     "));
-  Serial.println(F("                                                                           "));
+
+  if(k_val > 9){
+     Serial.println(F("For K10 probes, these are the recommended calibration values:            "));
+     Serial.println(F("  ec:cal,low,12880     calibrate EC probe to 12,880us                    "));
+     Serial.println(F("  ec:cal,high,150000   calibrate EC probe to 150.000us                   "));
+  }
+  else if(k_val > .9){
+     Serial.println(F("For K1 probes, these are the recommended calibration values:             "));
+     Serial.println(F("  ec:cal,low,12880     calibrate EC probe to 12,880us                    "));
+     Serial.println(F("  ec:cal,high,80000    calibrate EC probe to 80,000us                    "));
+  }
+  else if(k_val > .09){
+     Serial.println(F("For K0.1 probes, these are the recommended calibration values:           "));
+     Serial.println(F("  ec:cal,low,84        calibrate EC probe to 84us                        "));
+     Serial.println(F("  ec:cal,high,1413     calibrate EC probe to 1413us                      "));
+  }
+  
+  Serial.println(F("                                                                           ")); 
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
   Serial.println(F("                     t= the temperature you have chosen                    "));
   Serial.println(F("rtd:cal,clear        clear calibration                                     "));
