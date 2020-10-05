@@ -448,4 +448,8 @@ void print_help() {
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
   Serial.println(F("                     t= the temperature you have chosen                    "));
   Serial.println(F("rtd:cal,clear        clear calibration                                     "));
+  Serial.println(F("                                                                           "));
+  Serial.println(F("do:cal               calibrate DO probe to the air                         "));
+  Serial.println(F("do:cal,0             calibrate DO probe to O dissolved oxygen              "));
+  Serial.println(F("do:cal,clear         clear calibration                                     "));
 }
