@@ -65,7 +65,7 @@ enum errors get_error();
 ```
 
 
-# Ezo_i2c_util
+## Ezo_i2c_util
 Common functions used by Atlas Scientific Ezo sample code for printing various responses and info that would otherwise be duplicated in many examples.
 
 ```C++
@@ -91,7 +91,7 @@ void receive_and_print_response(Ezo_board &Device);
 //from the Ezo_i2c_lib and waiting the appropriate amount of time for the command
 ```
 
-# iot_cmd.h
+## iot_cmd
 Common functions used by Atlas Scientific Ezo sample code to receive user commands and send them to the circuits included in the IOT kits
 
 ```C++
@@ -111,5 +111,5 @@ void list_devices(Ezo_board device_list[], uint8_t device_list_len, Ezo_board* d
 //the default board
 ```
 
-# Sequencer# libs
+## Sequencer libs
 Several classes that allow easy sequencing of events without blocking. Useful for timer based events, running code concurrently, and allowing serial communication in scenarios where long delays would impede it. See the examples for how to work with this library.
