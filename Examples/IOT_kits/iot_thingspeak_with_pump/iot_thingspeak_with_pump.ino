@@ -43,7 +43,7 @@ const int EN_RTD = 15;
 const int EN_AUX = 13;
 
 const unsigned long reading_delay = 1000;                 //how long we wait to receive a response, in milliseconds 
-const unsigned long thingspeak_delay = 15000;             //how long we wait to send values to thinkspeak, in milliseconds
+const unsigned long thingspeak_delay = 15000;             //how long we wait to send values to thingspeak, in milliseconds
 
 unsigned int poll_delay = 2000 - reading_delay * 2 - 300; //how long to wait between polls after accounting for the times it takes to send readings
 
@@ -57,7 +57,7 @@ unsigned int poll_delay = 2000 - reading_delay * 2 - 300; //how long to wait bet
 float k_val = 0;                                          //holds the k value for determining what to print in the help menu
 
 bool polling  = true;                                     //variable to determine whether or not were polling the circuits
-bool send_to_thingspeak = true;                           //variable to determine whether or not were sending data to thinkspeak
+bool send_to_thingspeak = true;                           //variable to determine whether or not were sending data to thingspeak
 
 bool thingspeak_isconnected(){                            //function to check if wifi is connected
   return (WiFi.status() == WL_CONNECTED);
@@ -66,6 +66,7 @@ bool thingspeak_isconnected(){                            //function to check if
 void reconnect_wifi(){                                    //function to reconnect wifi if its not connected
   if(!thingspeak_isconnected()){
     WiFi.begin(ssid, pass);
+    Serial.println("connecting to wifi");
   }
 }
 
@@ -73,9 +74,9 @@ void thingspeak_send(){
   if (send_to_thingspeak == true) {                                                    //if we're datalogging
     int return_code = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey); 
     if (return_code == 200) {                                                          //code for successful transmission
-        Serial.println("sent to thinkspeak");
+        Serial.println("sent to thingspeak");
     }else{
-      Serial.println("couldnt send to thinkspeak");
+      Serial.println("couldnt send to thingspeak");
     }
   }
 }
@@ -91,7 +92,7 @@ Sequencer4 Seq(&step1, reading_delay,   //calls the steps in sequence with time 
 
 Sequencer1 Wifi_Seq(&reconnect_wifi, 10000);  //calls the wifi reconnect function every 10 seconds
 
-Sequencer1 Thingspeak_seq(&thingspeak_send, thingspeak_delay); //sends data to thinkspeak with the time determined by thingspeak delay
+Sequencer1 Thingspeak_seq(&thingspeak_send, thingspeak_delay); //sends data to thingspeak with the time determined by thingspeak delay
 
 void setup() {
 
@@ -121,7 +122,7 @@ void loop() {
   
   if (receive_command(cmd)) {            //if we sent the kit a command it gets put into the cmd variable
     polling = false;                     //we stop polling  
-    send_to_thingspeak = false;          //and sending data to thinkspeak
+    send_to_thingspeak = false;          //and sending data to thingspeak
     if(!process_coms(cmd)){              //then we evaluate the cmd for kit specific commands
       process_command(cmd, device_list, device_list_len, default_board);    //then if its not kit specific, pass the cmd to the IOT command processing function
     }

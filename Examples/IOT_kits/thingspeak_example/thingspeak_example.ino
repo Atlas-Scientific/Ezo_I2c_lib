@@ -33,15 +33,16 @@ bool thingspeak_isconnected(){                        //function to check if wif
 void reconnect_wifi(){                                //function to reconnect wifi if its not connected
   if(!thingspeak_isconnected()){
     WiFi.begin(ssid, pass);
+    Serial.println("connecting to wifi");
   }
 }
 
 void thingspeak_send(){                                           //if we're datalogging
   int return_code = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey); 
   if (return_code == 200) {                                       //code for successful transmission
-      Serial.println("sent to thinkspeak");
+      Serial.println("sent to thingspeak");
   }else{
-    Serial.println("couldnt send to thinkspeak");
+    Serial.println("couldnt send to thingspeak");
   }
 }
 
@@ -49,7 +50,7 @@ void step1();    //forward declarations of functions to use them in the sequence
 void step2();
 void step3();
 
-const unsigned long thingspeak_delay = 15000;            //how long we wait to send values to thinkspeak, in milliseconds
+const unsigned long thingspeak_delay = 15000;            //how long we wait to send values to thingspeak, in milliseconds
 const unsigned long reading_delay = 815;                 //how long we wait to receive a response, in milliseconds 
 
 Sequencer3 Seq(&step1, reading_delay,  //calls the steps in sequence with time in between them
@@ -58,7 +59,7 @@ Sequencer3 Seq(&step1, reading_delay,  //calls the steps in sequence with time i
 
 Sequencer1 Wifi_Seq( &reconnect_wifi, 10000);   //calls the wifi reconnect function every 10 seconds
 
-Sequencer1 Thingspeak_seq( &thingspeak_send, thingspeak_delay);    //calls the function to send data to thinkspeak every [thinkspeak_delay] milliseconds
+Sequencer1 Thingspeak_seq( &thingspeak_send, thingspeak_delay);    //calls the function to send data to thingspeak every [thingspeak_delay] milliseconds
 
 void setup() {                                                                    //set up the hardware
   pinMode(EN_PH, OUTPUT);                                                         //set enable pins as outputs
