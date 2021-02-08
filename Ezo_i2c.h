@@ -41,6 +41,7 @@ class Ezo_board{
 	Ezo_board(uint8_t address);	 //Takes I2C address of the device
 	Ezo_board(uint8_t address, const char* name); //Takes I2C address of the device
 												//as well a name of your choice
+	Ezo_board(uint8_t address, TwoWire* wire); //Takes I2C address and TwoWire interface
 	
 	void send_cmd(const char* command);	
 	//send any command in a string, see the devices datasheet for available i2c commands
@@ -94,6 +95,7 @@ class Ezo_board{
 	bool issued_read = false;
 	enum errors error;	
 	const static uint8_t bufferlen = 32;
+	TwoWire* wire = &Wire;
 };
 
 

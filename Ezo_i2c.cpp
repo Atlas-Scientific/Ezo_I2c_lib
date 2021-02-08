@@ -13,6 +13,10 @@ Ezo_board::Ezo_board(uint8_t address, const char* name){
 	this->name = name;
 }
 
+Ezo_board::Ezo_board(uint8_t address, TwoWire* wire) : Ezo_board(address){
+  this->wire = wire;
+}
+
 const char* Ezo_board::get_name(){
 	return this->name;
 }
@@ -22,9 +26,9 @@ uint8_t Ezo_board::get_address(){
 }
 
 void Ezo_board::send_cmd(const char* command) {
-  Wire.beginTransmission(this->i2c_address);
-  Wire.write(command); 
-  Wire.endTransmission();
+  wire->beginTransmission(this->i2c_address);
+  wire->write(command);
+  wire->endTransmission();
   this->issued_read = false;
 }
 
@@ -80,15 +84,15 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
 
   memset(sensordata_buffer, 0, buffer_len);        // clear sensordata array;
 
-  Wire.requestFrom(this->i2c_address, (uint8_t)(buffer_len-1), (uint8_t)1);
-  code = Wire.read();
+  wire->requestFrom(this->i2c_address, (uint8_t)(buffer_len-1), (uint8_t)1);
+  code = wire->read();
 
-  //Wire.beginTransmission(this->i2c_address);
-  while (Wire.available()) {
-    in_char = Wire.read();
+  //wire->beginTransmission(this->i2c_address);
+  while (wire->available()) {
+    in_char = wire->read();
 
     if (in_char == 0) {
-      //Wire.endTransmission();
+      //wire->endTransmission();
       break;
     }
     else {

@@ -21,7 +21,7 @@
       "maintainer": true
     }
   ],
-  "version": "32e1eda",
+  "version": "1.0.0+32e1eda",
   "frameworks": "arduino",
   "platforms": [
     "espressif8266",
