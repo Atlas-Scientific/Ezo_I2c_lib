@@ -55,12 +55,12 @@ float k_val = 0;                                          //holds the k value fo
 bool polling  = true;                                     //variable to determine whether or not were polling the circuits
 bool send_to_thingspeak = true;                           //variable to determine whether or not were sending data to thingspeak
 
-bool thingspeak_isconnected(){                            //function to check if wifi is connected
+bool wifi_isconnected(){                            //function to check if wifi is connected
   return (WiFi.status() == WL_CONNECTED);
 }
 
 void reconnect_wifi(){                                    //function to reconnect wifi if its not connected
-  if(!thingspeak_isconnected()){
+  if(!wifi_isconnected()){
     WiFi.begin(ssid, pass);
     Serial.println("connecting to wifi");
   }
@@ -68,11 +68,13 @@ void reconnect_wifi(){                                    //function to reconnec
 
 void thingspeak_send(){
   if (send_to_thingspeak == true) {                                                    //if we're datalogging
-    int return_code = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey); 
-    if (return_code == 200) {                                                          //code for successful transmission
-        Serial.println("sent to thingspeak");
-    }else{
-      Serial.println("couldnt send to thingspeak");
+    if(wifi_isconnected()){
+      int return_code = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey); 
+      if (return_code == 200) {                                                          //code for successful transmission
+          Serial.println("sent to thingspeak");
+      }else{
+        Serial.println("couldnt send to thingspeak");
+      }
     }
   }
 }
