@@ -267,7 +267,7 @@ void print_help() {
   Serial.println(F("Commands:                                                                  "));
   Serial.println(F("datalog      Takes readings of all sensors every 15 sec send to thingspeak "));
   Serial.println(F("             Entering any commands stops datalog mode.                     "));
-  Serial.println(F("poll         Takes readings of all sensors every second                    "));
+  Serial.println(F("poll         Takes readings continuously of all sensors                    "));
   Serial.println(F("                                                                           "));
   Serial.println(F("ph:cal,mid,7     calibrate to pH 7                                         "));
   Serial.println(F("ph:cal,low,4     calibrate to pH 4                                         "));
@@ -281,7 +281,7 @@ void print_help() {
   if(k_val > 9){
      Serial.println(F("For K10 probes, these are the recommended calibration values:            "));
      Serial.println(F("  ec:cal,low,12880     calibrate EC probe to 12,880us                    "));
-     Serial.println(F("  ec:cal,high,150000   calibrate EC probe to 150.000us                   "));
+     Serial.println(F("  ec:cal,high,150000   calibrate EC probe to 150,000us                   "));
   }
   else if(k_val > .9){
      Serial.println(F("For K1 probes, these are the recommended calibration values:             "));

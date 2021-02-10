@@ -207,7 +207,7 @@ void print_help() {
   Serial.println(F("Commands:                                                                  "));
   Serial.println(F("datalog      Takes readings of all sensors every 15 sec send to thingspeak "));
   Serial.println(F("             Entering any commands stops datalog mode.                     "));
-  Serial.println(F("poll         Takes readings of all sensors every second                    "));
+  Serial.println(F("poll         Takes readings continuously of all sensors                    "));
   Serial.println(F("                                                                           "));
   Serial.println(F("ph:cal,mid,7     calibrate to pH 7                                         "));
   Serial.println(F("ph:cal,low,4     calibrate to pH 4                                         "));
