@@ -13,7 +13,7 @@ bool receive_command(String &string_buffer);
 //returns true if a command was received and false if it wasn't
 
 void process_command(const String &string_buffer, Ezo_board device_list[], 
-                     uint8_t device_list_len, Ezo_board* default_board);
+                     uint8_t device_list_len, Ezo_board* &default_board);
 //handles the common functions of the IOT kit command processing
 //such as listing boards, sending commands to one or all boards, and
 //switching which board commands are sent to by default

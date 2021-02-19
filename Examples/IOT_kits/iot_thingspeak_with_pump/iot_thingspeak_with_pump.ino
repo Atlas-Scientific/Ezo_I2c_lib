@@ -274,6 +274,9 @@ void print_help() {
   Serial.println(F("ph:cal,high,10   calibrate to pH 10                                        "));
   Serial.println(F("ph:cal,clear     clear calibration                                         "));
   Serial.println(F("                                                                           "));
+  Serial.println(F("orp:cal,225          calibrate orp probe to 225mV                          "));
+  Serial.println(F("orp:cal,clear        clear calibration                                     "));
+  Serial.println(F("                                                                           "));
   Serial.println(F("ec:cal,dry           calibrate a dry EC probe                              "));
   Serial.println(F("ec:k,[n]             used to switch K values, standard probes values are 0.1, 1, and 10 "));
   Serial.println(F("ec:cal,clear         clear calibration                                     "));
@@ -298,8 +301,4 @@ void print_help() {
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
   Serial.println(F("                     t= the temperature you have chosen                    "));
   Serial.println(F("rtd:cal,clear        clear calibration                                     "));
-  Serial.println(F("                                                                           "));
-  Serial.println(F("do:cal               calibrate DO probe to the air                         "));
-  Serial.println(F("do:cal,0             calibrate DO probe to O dissolved oxygen              "));
-  Serial.println(F("do:cal,clear         clear calibration                                     "));
-}
+ }

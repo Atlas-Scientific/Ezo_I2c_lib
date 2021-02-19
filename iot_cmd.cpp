@@ -24,7 +24,7 @@ void select_delay(const String &str) {
   }
 }
 
-void process_command(const String &string_buffer, Ezo_board device_list[], uint8_t device_list_len, Ezo_board* default_board){
+void process_command(const String &string_buffer, Ezo_board device_list[], uint8_t device_list_len, Ezo_board* &default_board){
     
   if (string_buffer == "LIST") {                    //if our command is list
     list_devices(device_list, device_list_len, default_board);
