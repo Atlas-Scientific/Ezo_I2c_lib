@@ -175,12 +175,10 @@ void step2() {
   if ((RTD.get_error() == Ezo_board::SUCCESS) && (RTD.get_last_received_reading() > -1000.0)) { //if the temperature reading has been received and it is valid
     PH.send_cmd_with_num("T,", RTD.get_last_received_reading());
     EC.send_cmd_with_num("T,", RTD.get_last_received_reading());
-    ORP.send_cmd_with_num("T,", RTD.get_last_received_reading());
     ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                 //assign temperature readings to the third column of thingspeak channel
   } else {                                                                                      //if the temperature reading is invalid
     PH.send_cmd_with_num("T,", 25.0);
     EC.send_cmd_with_num("T,", 25.0);                                                          //send default temp = 25 deg C to EC sensor
-    ORP.send_cmd_with_num("T,", 20.0);
     ThingSpeak.setField(3, String(25.0, 2));                 //assign temperature readings to the third column of thingspeak channel
   }
 
