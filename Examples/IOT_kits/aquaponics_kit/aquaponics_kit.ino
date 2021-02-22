@@ -19,16 +19,18 @@ const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";                 //Your ThingSpe
 
 Ezo_board PH = Ezo_board(99, "PH");       //create a PH circuit object, who's address is 99 and name is "PH"
 Ezo_board EC = Ezo_board(100, "EC");      //create an EC circuit object who's address is 100 and name is "EC"
+Ezo_board DO = Ezo_board(97, "DO");    //create a DO circuit object who's address is 97 and name is "DO"
 Ezo_board RTD = Ezo_board(102, "RTD");    //create an RTD circuit object who's address is 102 and name is "RTD"
-Ezo_board DO = Ezo_board(97, "DO");       //create a DO circuit object who's address is 97 and name is "DO"
+Ezo_board PMP = Ezo_board(103, "PMP");    //create an PMP circuit object who's address is 103 and name is "PMP"
 Ezo_board HUM = Ezo_board(111, "HUM");    //create a HUM circuit object who's address is 111 and name is "HUM"
 Ezo_board CO2 = Ezo_board(105, "CO2");    //create a CO2 circuit object who's address is 105 and name is "CO2"
 
-Ezo_board device_list[] = {     //an array of boards used for sending commands to all or specific boards
+Ezo_board device_list[] = {           //an array of boards used for sending commands to all or specific boards
   PH,
   EC,
   RTD,
   DO,
+  PMP,
   HUM,
   CO2
 };
@@ -48,7 +50,15 @@ const int EN_AIR_SENSE = 16;
 const unsigned long reading_delay = 1000;                   //how long we wait to receive a response, in milliseconds 
 const unsigned long thingspeak_delay = 15000;               //how long we wait to send values to thingspeak, in milliseconds
 
-unsigned int poll_delay = thingspeak_delay - reading_delay * 2 - 300;  //how long to wait between polls after accounting for the times it takes to send readings
+unsigned int poll_delay = 2000 - reading_delay * 2 - 300;   //how long to wait between polls after accounting for the times it takes to send readings
+
+//parameters for setting the pump output
+#define PUMP_BOARD        PMP       //the pump that will do the output (if theres more than one)
+#define PUMP_DOSE         -0.5      //the dose that the pump will dispense
+#define EZO_BOARD         EC        //the circuit that will be the target of comparison
+#define IS_GREATER_THAN   true      //true means the circuit's reading has to be greater than the comparison value, false mean it has to be less than
+#define COMPARISON_VALUE  1000      //the threshold above or below which the pump is activated
+
 
 float k_val = 0;                                          //holds the k value for determining what to print in the help menu
 
@@ -79,17 +89,19 @@ void thingspeak_send(){
   }
 }
 
-void step1();      //forward declarations of functions to use them in the sequencer before defining them
+void step1();     //forward declarations of functions to use them in the sequencer before defining them
 void step2();
 void step3();
 void step4();
 
-Sequencer4 Seq(&step1, reading_delay,     //calls the steps in sequence with time in between them
+Sequencer4 Seq(&step1, reading_delay,   //calls the steps in sequence with time in between them
                &step2, 300, 
                &step3, reading_delay, 
-               &step4, poll_delay);
+               &step4, poll_delay );
 
-Sequencer1 Wifi_Seq(&reconnect_wifi, 10000);     //calls the wifi reconnect function every 10 seconds
+Sequencer1 Wifi_Seq(&reconnect_wifi, 10000);  //calls the wifi reconnect function every 10 seconds
+
+Sequencer1 Thingspeak_seq(&thingspeak_send, thingspeak_delay);  //sends data to thingspeak with the time determined by thingspeak delay
 
 void setup() {
 
@@ -109,8 +121,9 @@ void setup() {
 
   WiFi.mode(WIFI_STA);                    //set ESP8266 mode as a station to be connected to wifi network
   ThingSpeak.begin(client);               //enable ThingSpeak connection
-  Wifi_Seq.reset();
+  Wifi_Seq.reset();                       //initialize the sequencers
   Seq.reset();
+  Thingspeak_seq.reset();
 }
 
 void loop() {
@@ -128,6 +141,34 @@ void loop() {
   
   if (polling == true) {                 //if polling is turned on, run the sequencer
     Seq.run();
+    Thingspeak_seq.run();
+  }
+}
+
+//function that controls the pumps activation and output
+void pump_function(Ezo_board &pump, Ezo_board &sensor, float value, float dose, bool greater_than){
+ if (sensor.get_error() == Ezo_board::SUCCESS) {                    //make sure we have a valid reading before we make any decisions
+    bool comparison = false;                                        //variable for holding the reuslt of the comparison
+    if(greater_than){                                               //we do different comparisons depending on what the user wants
+      comparison = (sensor.get_last_received_reading() >= value);   //compare the reading of the circuit to the comparison value to determine whether we actiavte the pump
+    }else{
+      comparison = (sensor.get_last_received_reading() <= value);
+    }
+    if (comparison) {                                               //if the result of the comparison means we should activate the pump
+      pump.send_cmd_with_num("d,", dose);                           //dispense the dose
+      delay(100);                                                   //wait a few milliseconds before getting pump results
+      Serial.print(pump.get_name());                                //get pump data to tell the user if the command was received successfully
+      Serial.print(" ");
+      char response[20]; 
+      if(pump.receive_cmd(response, 20) == Ezo_board::SUCCESS){
+        Serial.print("pump dispensed ");
+      }else{
+        Serial.print("pump error ");
+      }
+      Serial.println(response);
+    }else {
+      pump.send_cmd("x");                                          //if we're not supposed to dispense, stop the pump
+    }
   }
 }
 
@@ -147,7 +188,7 @@ void step2() {
     ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                 //assign temperature readings to the third column of thingspeak channel
   } else {                                                                                      //if the temperature reading is invalid
     PH.send_cmd_with_num("T,", 25.0);
-    EC.send_cmd_with_num("T,", 25.0);      
+    EC.send_cmd_with_num("T,", 25.0);                                                          //send default temp = 25 deg C to EC sensor
     DO.send_cmd_with_num("T,", 20.0);
     ThingSpeak.setField(3, String(25.0, 2));                 //assign temperature readings to the third column of thingspeak channel
   }
@@ -165,8 +206,13 @@ void step3() {
   HUM.send_read_cmd();
 }
 
-void step4() {
-
+void step4() {  
+  Serial.print("  ");
+  receive_and_print_reading(HUM);
+  if (HUM.get_error() == Ezo_board::SUCCESS) {                                          //if the DO reading was successful (back in step 1)
+    ThingSpeak.setField(4, String(HUM.get_last_received_reading(), 2));                 //assign DO readings to the fourth column of thingspeak channel
+  }
+  Serial.print("  ");
   receive_and_print_reading(PH);             //get the reading from the PH circuit
   if (PH.get_error() == Ezo_board::SUCCESS) {                                          //if the PH reading was successful (back in step 1)
      ThingSpeak.setField(1, String(PH.get_last_received_reading(), 2));                 //assign PH readings to the first column of thingspeak channel
@@ -178,14 +224,8 @@ void step4() {
   }
   Serial.print("  ");
   receive_and_print_reading(DO);             //get the reading from the DO circuit
-  if (DO.get_error() == Ezo_board::SUCCESS) {                                          //if the DO reading was successful (back in step 1)
-    ThingSpeak.setField(4, String(DO.get_last_received_reading(), 2));                 //assign DO readings to the fourth column of thingspeak channel
-  }
-  Serial.print("  ");
-    
-  receive_and_print_reading(HUM);
-  if (HUM.get_error() == Ezo_board::SUCCESS) {                                          //if the DO reading was successful (back in step 1)
-    ThingSpeak.setField(4, String(HUM.get_last_received_reading(), 2));                 //assign DO readings to the fourth column of thingspeak channel
+  if (DO.get_error() == Ezo_board::SUCCESS) {                                          //if the ORP reading was successful (back in step 1)
+    ThingSpeak.setField(4, String(DO.get_last_received_reading(), 2));                 //assign ORP readings to the fourth column of thingspeak channel
   }
   Serial.print("  ");
   receive_and_print_reading(CO2);
@@ -194,21 +234,17 @@ void step4() {
   }
 
   Serial.println();
-
-  thingspeak_send();                                                        //send circuit data to thingspeak
+  pump_function(PUMP_BOARD, EZO_BOARD, COMPARISON_VALUE, PUMP_DOSE, IS_GREATER_THAN);
 }
-
 
 
 void start_datalogging() {
   polling = true;                                                 //set poll to true to start the polling loop
   send_to_thingspeak = true;
-  poll_delay = thingspeak_delay - reading_delay * 2 - 300;        //set poll delay to take reading times into account
-  Seq.reset();
-  
+  Thingspeak_seq.reset();
 }
 
-bool process_coms(const String &string_buffer) {
+bool process_coms(const String &string_buffer) {      //function to process commands that manipulate global variables and are specifc to certain kits
   if (string_buffer == "HELP") {
     print_help();
     return true;
@@ -234,7 +270,7 @@ bool process_coms(const String &string_buffer) {
     }
     return true;
   }
-  return false;      //return false if the command is not in the list, so we can scan the other list or pass it to the circuit
+  return false;                   //print an error if the polling time isnt valid
 }
 
 void get_ec_k_value(){                                    //function to query the value of the ec circuit
@@ -245,6 +281,7 @@ void get_ec_k_value(){                                    //function to query th
     k_val = String(rx_buf).substring(3).toFloat();        //parse the reading into a float
   }
 }
+
 void print_help() {
   get_ec_k_value();
   Serial.println(F("Atlas Scientific I2C hydroponics kit                                       "));
