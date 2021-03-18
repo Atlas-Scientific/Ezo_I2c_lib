@@ -5,8 +5,8 @@
 #include <Ezo_i2c_util.h>                                        //brings in common print statements
 #include <Ezo_i2c.h>                                             //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>                                                //include arduinos i2c library
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
+#include <Adafruit_MQTT.h>
+#include <Adafruit_MQTT_Client.h>
 
 WiFiClient client;                                              //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
 
