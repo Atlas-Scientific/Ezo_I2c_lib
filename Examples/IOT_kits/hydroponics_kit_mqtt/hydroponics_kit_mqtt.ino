@@ -65,7 +65,7 @@ const unsigned long long_delay = 1200;              //how long we wait for comma
 
 //parameters for setting the pump output
 #define PUMP_BOARD        PMP       //the pump that will do the output (if theres more than one)
-#define PUMP_DOSE         -0.5      //the dose that the pump will dispense
+#define PUMP_DOSE         -0.5      //the dose that the pump will dispense in  milliliters
 #define EZO_BOARD         EC        //the circuit that will be the target of comparison
 #define IS_GREATER_THAN   true      //true means the circuit's reading has to be greater than the comparison value, false mean it has to be less than
 #define COMPARISON_VALUE  1000      //the threshold above or below which the pump is activated
@@ -125,9 +125,11 @@ void setup() {
   pinMode(EN_PH, OUTPUT);                                                         //set enable pins as outputs
   pinMode(EN_EC, OUTPUT);
   pinMode(EN_RTD, OUTPUT);
+  pinMode(EN_AUX, OUTPUT);
   digitalWrite(EN_PH, LOW);                                                       //set enable pins to enable the circuits
   digitalWrite(EN_EC, LOW);
   digitalWrite(EN_RTD, HIGH);
+  digitalWrite(EN_AUX, LOW);
 
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                     //start the serial communication to the computer
