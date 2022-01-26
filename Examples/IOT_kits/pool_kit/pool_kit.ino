@@ -1,5 +1,7 @@
+//This code is for the Atlas Scientific wifi pool kit that uses the Adafruit huzzah32 as its computer.
+
 #include <iot_cmd.h>
-#include <ESP8266WiFi.h>                                         //include esp8266 wifi library 
+#include <WiFi.h>                                                //include wifi library 
 #include "ThingSpeak.h"                                          //include thingspeak library
 #include <sequencer4.h>                                          //imports a 4 function sequencer 
 #include <sequencer1.h>                                          //imports a 1 function sequencer 
@@ -15,7 +17,6 @@ const String pass = "Wifi Password";                             //Your WiFi net
 const long myChannelNumber = 1234566;                            //Your Thingspeak channel number
 const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";                 //Your ThingSpeak Write API Key
 //------------------------------------------------------------------
-
 
 Ezo_board PH = Ezo_board(99, "PH");           //create a PH circuit object, who's address is 99 and name is "PH"
 Ezo_board ORP = Ezo_board(98, "ORP");         //create an ORP circuit object who's address is 98 and name is "ORP"
@@ -35,10 +36,10 @@ Ezo_board* default_board = &device_list[0]; //used to store the board were talki
 const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
 //enable pins for each circuit
-const int EN_PH = 14;
-const int EN_ORP = 12;
+const int EN_PH = 12;
+const int EN_ORP = 27;
 const int EN_RTD = 15;
-const int EN_AUX = 13;
+const int EN_AUX = 33;
 
 const unsigned long reading_delay = 1000;                 //how long we wait to receive a response, in milliseconds
 const unsigned long thingspeak_delay = 15000;             //how long we wait to send values to thingspeak, in milliseconds
@@ -63,7 +64,7 @@ bool wifi_isconnected() {                           //function to check if wifi 
 
 void reconnect_wifi() {                                   //function to reconnect wifi if its not connected
   if (!wifi_isconnected()) {
-    WiFi.begin(ssid, pass);
+    WiFi.begin(ssid.c_str(), pass.c_str());
     Serial.println("connecting to wifi");
   }
 }
@@ -108,7 +109,7 @@ void setup() {
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                     //start the serial communication to the computer
 
-  WiFi.mode(WIFI_STA);                    //set ESP8266 mode as a station to be connected to wifi network
+  WiFi.mode(WIFI_STA);                    //set ESP32 mode as a station to be connected to wifi network
   ThingSpeak.begin(client);               //enable ThingSpeak connection
   Wifi_Seq.reset();                       //initialize the sequencers
   Seq.reset();
