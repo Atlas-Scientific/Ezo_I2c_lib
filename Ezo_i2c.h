@@ -86,6 +86,8 @@ class Ezo_board{
     uint8_t get_address();
     //returns the address of the device
     
+    void set_address(uint8_t address);
+    //lets you change the I2C address of the device
     
 	protected:
 	uint8_t i2c_address;

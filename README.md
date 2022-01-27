@@ -58,6 +58,9 @@ const char* get_name();
 
 uint8_t get_address();
 //returns the address of the device
+    
+void set_address(uint8_t address);
+//lets you change the I2C address of the device
 
 enum errors get_error();	
 //returns the error status of the last received command, 
