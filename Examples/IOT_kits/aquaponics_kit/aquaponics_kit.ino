@@ -41,9 +41,9 @@ const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
 //enable pins for each circuit
 const int EN_PH = 13;
-const int EN_DO = 27;
+const int EN_DO = 12;
 const int EN_RTD = 33;
-const int EN_EC = 12;
+const int EN_EC = 27;
 const int EN_HUM = 32;
 const int EN_CO2 = 15;
 
