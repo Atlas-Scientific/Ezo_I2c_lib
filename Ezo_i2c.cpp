@@ -38,7 +38,7 @@ void Ezo_board::send_read_cmd(){
 }
 
 void Ezo_board::send_cmd_with_num(const char* cmd, float num, uint8_t decimal_amount){
-	String temp = String(cmd )+ String(num, decimal_amount);
+	String temp = String(cmd )+ String(num, (unsigned int)decimal_amount);
 	const char* pointer = temp.c_str();
 	send_cmd(pointer);
 }
