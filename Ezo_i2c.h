@@ -79,6 +79,9 @@ class Ezo_board{
 	const char* get_name();		
 	//returns a pointer to the name string
 	
+	void set_name(const char* name);
+	//set a pointer to the name string
+	
 	enum errors get_error();	
 	//returns the error status of the last received command, 
 	//used to check the validity of the data returned by get_reading()
@@ -88,7 +91,7 @@ class Ezo_board{
     
     void set_address(uint8_t address);
     //lets you change the I2C address of the device
-    
+	
 	protected:
 	uint8_t i2c_address;
 	const char* name = 0;

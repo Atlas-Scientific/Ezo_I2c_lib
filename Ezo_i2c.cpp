@@ -17,6 +17,10 @@ const char* Ezo_board::get_name(){
 	return this->name;
 }
 
+void Ezo_board::set_name(const char* name){
+	this->name = name;
+}
+
 uint8_t Ezo_board::get_address(){
     return i2c_address;
 }
