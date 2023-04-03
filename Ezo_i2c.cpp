@@ -17,6 +17,10 @@ Ezo_board::Ezo_board(uint8_t address, TwoWire* wire) : Ezo_board(address){
   this->wire = wire;
 }
 
+Ezo_board::Ezo_board(uint8_t address, const char* name, TwoWire* wire) : Ezo_board(address, name){
+  this->wire = wire;
+}
+
 const char* Ezo_board::get_name(){
 	return this->name;
 }
