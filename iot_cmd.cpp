@@ -87,10 +87,11 @@ void process_command(const String &string_buffer, Ezo_board* device_list[], uint
     else {                                                          //if theres no colon just pass the command to the default board
       default_board->send_cmd(string_buffer.c_str());
     }
+	if(string_buffer != "SLEEP"){
+		select_delay(string_buffer);                                   //wait for some time depending on the command
 
-    select_delay(string_buffer);                                   //wait for some time depending on the command
-
-    receive_and_print_response(*default_board);
+		receive_and_print_response(*default_board);
+	}
   }
 }
 
