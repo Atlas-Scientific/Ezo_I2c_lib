@@ -19,6 +19,7 @@ void print_success_or_error(Ezo_board &Device, const char* success_string);
 //for the error case, where the device gets an improper command, it prints "Failed "
 //for the not ready case, where the device isnt done processing the command, it prints "Pending "
 //for the no data case, where it cannot communicate with the device, it prints "No Data "
+//for the not read cmd case, where the send_read() method was not called and issued_read is unset, it prints "Not Read "
 //if the message is received correctly it prints the success_string that's passed in. This can be used
 //to print the reading in cases where the command succeeds for example
 
