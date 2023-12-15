@@ -79,10 +79,13 @@ class Ezo_board{
 	//returns the last reading the device received as a float
 	
 	const char* get_name();		
-	//returns a pointer to the name string
+	//returns a pointer to the name string. This gets the name given to object by the constructor
+	//not the device name returned by the "name,?" command. 
+	//To get the device name use [device].send_cmd("name,?") and read the response with receive_cmd
 	
 	void set_name(const char* name);
-	//set a pointer to the name string
+	//set a pointer to the name string. This sets the name of the object, not the device itself. 
+	//if you want to rename the device use [device].send_cmd("name,THE_DEVICE_NAME")
 	
 	enum errors get_error();	
 	//returns the error status of the last received command, 
