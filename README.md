@@ -56,7 +56,9 @@ float get_last_received_reading();
 //returns the last reading the device received as a float
 
 const char* get_name();		
-//returns a pointer to the name string
+//returns a pointer to the name string. This gets the name given to the object by the constructor
+//not the device name returned by the "name,?" command. 
+//To get the device name use [device].send_cmd("name,?") and read the response with receive_cmd
 
 uint8_t get_address();
 //returns the address of the device
