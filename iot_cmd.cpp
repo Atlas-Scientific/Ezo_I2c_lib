@@ -3,11 +3,11 @@
 #include <Ezo_i2c_util.h>
 
 bool receive_command(String &string_buffer){
-    if (Serial.available()) {                           //if theres any characters in the UART buffer
+    if (Web.available()) {                           //if theres any characters in the UART buffer
      
-        string_buffer = Serial.readString();             //get them until its a complete command
-        Serial.print("> ");                               //print whatever we received
-        Serial.println(string_buffer);
+        string_buffer = Web.readString();             //get them until its a complete command
+        WebSerial.print("> ");                               //print whatever we received
+        Web.println(string_buffer);
         string_buffer.toUpperCase();                     //turn the command to uppercase for easier comparisions
         string_buffer.trim();                            //remove all extra spaces and newlines
         return true;
@@ -76,12 +76,12 @@ void process_command(const String &string_buffer, Ezo_board* device_list[], uint
         if (addr_found) {                                           //then send the rest of the command to that board
           default_board->send_cmd(string_buffer.substring(index + 1).c_str());
         } else {                                                    //otherwise print that we didnt find
-          Serial.print("No device named ");
-          Serial.println(name_to_find);
+          Web.print("No device named ");
+          Web.println(name_to_find);
           return;
         }
       } else {
-        Serial.println("Invalid name");
+        Web.println("Invalid name");
       }
     }
     else {                                                          //if theres no colon just pass the command to the default board
@@ -99,12 +99,12 @@ void list_devices(Ezo_board device_list[], uint8_t device_list_len, Ezo_board* d
 	
 	for (uint8_t i = 0; i < device_list_len; i++) {        //go thorugh the list of boards
 		if (default_board == &device_list[i]) {              //if its our default board
-		  Serial.print("--> ");                             //print the pointer arrow
+		  Web.print("--> ");                             //print the pointer arrow
 		} else {                                            //otherwise
-		  Serial.print(" - ");                              //print a normal dash
+		  Web.print(" - ");                              //print a normal dash
 		}
 		print_device_info(device_list[i]);                   //then print the boards info
-		Serial.println("");
+		Web.println("");
 	}
   
 }
@@ -113,30 +113,30 @@ void list_devices(Ezo_board device_list[], uint8_t device_list_len, Ezo_board* d
 void list_devices(Ezo_board* device_list[], uint8_t device_list_len, Ezo_board* default_board) {
   for (uint8_t i = 0; i < device_list_len; i++) {        //go thorugh the list of boards
     if (default_board == device_list[i]) {              //if its our default board
-      Serial.print("--> ");                             //print the pointer arrow
+      Web.print("--> ");                             //print the pointer arrow
     } else {                                            //otherwise
-      Serial.print(" - ");                              //print a normal dash
+      Web.print(" - ");                              //print a normal dash
     }
     print_device_info(*device_list[i]);                   //then print the boards info
-    Serial.println("");
+    Web.println("");
   }
 }
 
 
 void iot_cmd_print_listcmd_help(){
-  //Serial.println(F("                                                                           "));
-	Serial.println(F("list              prints the names and addresses of all the devices in the "));
-	Serial.println(F("                  device list, with an arrow pointing to the default board "));
+  //Web.println(F("                                                                           "));
+	Web.println(F("list              prints the names and addresses of all the devices in the "));
+	Web.println(F("                  device list, with an arrow pointing to the default board "));
 }
 
 void iot_cmd_print_allcmd_help(){
-	Serial.println(F("all:[query]       sends a query to all devices in the device list, and     "));
-	Serial.println(F("                  prints their responses"));
+	Web.println(F("all:[query]       sends a query to all devices in the device list, and     "));
+	Web.println(F("                  prints their responses"));
 }
 
 void iot_cmd_print_namedquery_help(){
-	Serial.println(F("[name]:[query]    sends a query to the device with the name [name], and "));
-	Serial.println(F("                  makes that device the default board"));
-	Serial.println(F("                      ex: PH:status sends a status query to the device "));
-	Serial.println(F("                      named PH"));
+	Web.println(F("[name]:[query]    sends a query to the device with the name [name], and "));
+	Web.println(F("                  makes that device the default board"));
+	Web.println(F("                      ex: PH:status sends a status query to the device "));
+	Web.println(F("                      named PH"));
 }
