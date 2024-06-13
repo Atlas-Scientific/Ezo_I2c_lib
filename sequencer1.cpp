@@ -16,6 +16,10 @@ void Sequencer1::reset(){
      next_step_time = 0;
 }
 
+void Sequencer1::reset(unsigned long delay){
+     next_step_time = millis() + delay;
+}
+
 unsigned long Sequencer1::get_step1_time(){
     return t1;
 }

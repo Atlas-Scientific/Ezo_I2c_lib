@@ -10,6 +10,7 @@ class Sequencer1{
     Sequencer1( void (*step1)(), unsigned long time1);
     
     void reset();
+	void reset(unsigned long delay);
     
     void run();
     

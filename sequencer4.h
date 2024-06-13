@@ -15,6 +15,7 @@ class Sequencer4{
                 void (*step4)(), unsigned long time4);
     
     void reset();
+	void reset(unsigned long delay);
     
     void run();
     

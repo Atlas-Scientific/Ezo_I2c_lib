@@ -48,6 +48,11 @@ void Sequencer4::reset(){
      next_step_time = 0;
 }
 
+void Sequencer4::reset(unsigned long delay){
+     current_step = STEP1;
+     next_step_time = millis() + delay;
+}
+
 void Sequencer4::run(){
     
     switch (current_step) {

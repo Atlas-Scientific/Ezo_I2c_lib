@@ -13,6 +13,7 @@ class Sequencer2{
                 void (*step2)(), unsigned long time2);
     
     void reset();
+	void reset(unsigned long delay);
     
     void run();
     

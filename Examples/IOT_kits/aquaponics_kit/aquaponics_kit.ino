@@ -40,12 +40,23 @@ Ezo_board* default_board = &device_list[0]; //used to store the board were talki
 const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
 //enable pins for each circuit
-const int EN_PH = 13;
-const int EN_DO = 12;
-const int EN_RTD = 33;
-const int EN_EC = 27;
-const int EN_HUM = 32;
-const int EN_CO2 = 15;
+//------For board version 1.7 use these enable pins for each circuit------
+//const int EN_PH = 13;
+//const int EN_DO = 12;
+//const int EN_RTD = 33;
+//const int EN_EC = 27;
+//const int EN_HUM = 32;
+//const int EN_CO2 = 15;
+//------------------------------------------------------------------
+
+//------For board version 1.8 use these enable pins for each circuit------
+const int EN_PH = 12;
+const int EN_DO = 27;
+const int EN_RTD = 15;
+const int EN_EC = 33;
+const int EN_HUM = 14;
+const int EN_CO2 = 32;
+//------------------------------------------------------------------
 
 
 const unsigned long reading_delay = 1000;                   //how long we wait to receive a response, in milliseconds

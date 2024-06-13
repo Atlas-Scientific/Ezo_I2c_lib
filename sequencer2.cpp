@@ -30,6 +30,11 @@ void Sequencer2::reset(){
      next_step_time = 0;
 }
 
+void Sequencer2::reset(unsigned long delay){
+     current_step = STEP1;
+     next_step_time = millis() + delay;
+}
+
 void Sequencer2::run(){
     
     switch (current_step) {
