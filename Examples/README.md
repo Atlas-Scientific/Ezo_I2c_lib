@@ -11,6 +11,7 @@ Code for Atlas Scientific Wi-Fi IOT kits:
 
 ## Products/tri_pmp_sample_code
 Sample code for the Atlas Scientific [TRI-PMP-BX](https://atlas-scientific.com/peristaltic/tri-pmp-bx/)
+and [Interlink and Whitebox Shields](https://atlas-scientific.com/carrier-boards)
 
 ## Projects
 Code used in [Instructables](https://www.instructables.com/member/AtlasScientific/) and [Hackster.io](https://www.hackster.io/atlasscientific) projects

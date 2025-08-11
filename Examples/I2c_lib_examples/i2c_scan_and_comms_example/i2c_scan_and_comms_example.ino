@@ -4,7 +4,7 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
-Ezo_board Unknown_Device = Ezo_board(20, "found device");   //object which holds the device we'll find
+Ezo_board Unknown_Device = Ezo_board(20, "found device", &Wire1);   //object which holds the device we'll find
 
 Ezo_board *device_list[] = {               //an array of boards used for sending commands to all or specific boards
   &Unknown_Device
