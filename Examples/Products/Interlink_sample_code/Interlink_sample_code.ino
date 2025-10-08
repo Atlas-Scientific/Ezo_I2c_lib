@@ -117,6 +117,15 @@ bool scan_devices() {
     uint8_t error = Wire.endTransmission();       //check if communication attempt was successful
     if (error == 0) {                             //if its possible to communicate with it
       device_list[found_devices].set_address(i);  //set that to be the address
+      delay(200);
+        //if theres data in the ezos we should get it before asking for more info
+      char receive_buffer[32];                 //buffer used to hold each boards response
+      device_list[found_devices].receive_cmd(receive_buffer, 32);  //put the response into the buffer
+      delay(200);
+      //check twice in case it was in the middle of processing a long command
+      device_list[found_devices].receive_cmd(receive_buffer, 32);  //put the response into the buffer
+      delay(200);
+
       device_list[found_devices].send_cmd("I");  //ask what kind of device it is
       if (found_devices < device_list_len) {
         found_devices++;
@@ -127,7 +136,7 @@ bool scan_devices() {
 }
 
 void receive_devicetypes(){
-  delay(400);
+  delay(100);
   for (int i = 0; i < found_devices; i++) {
     receive_devicetype(device_list[i]);
   }
@@ -137,7 +146,7 @@ void query_name(){
   for (int i = 0; i < found_devices; i++) {
     device_list[i].send_cmd("name,?");
   }
-  delay(400);
+  delay(100);
   for (int i = 0; i < found_devices; i++) {
     receive_name(device_list[i]);
   }
@@ -189,10 +198,11 @@ void step1() {
 
 void step2() {
   for (int i = 0; i < found_devices; i++) {
-    receive_reading(device_list[i]);  //get the reading from the PH circuit
-    Serial.println();
+    receive_reading(device_list[i]);  //get the reading from the circuit
+    Serial.println(" ");
   }
-  Serial.println("----------");
+ Serial.println("----------");
+//  Serial.println();
 }
 
 bool process_coms(const String &string_buffer) {  //function to process commands that manipulate global variables and are specifc to certain kits
