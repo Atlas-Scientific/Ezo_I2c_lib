@@ -1,4 +1,4 @@
-//This code is for the Atlas Scientific wifi hydroponics kit that uses the Adafruit ESP32-S3 TFT Feather as its computer.
+//This code is for the Atlas Scientific wifi hydroponics kit that uses the Adafruit huzzah32 as its computer.
 
 #include <iot_cmd.h>
 #include <WiFi.h>                                                //include wifi library 
@@ -9,18 +9,7 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
-#include <SPI.h>
-
-#include <Fonts/FreeSansBold12pt7b.h>
-#include <Fonts/FreeSansBold18pt7b.h>
-
-WiFiClient client;   
-
-// Use dedicated hardware SPI pins
-Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-GFXcanvas16 canvas(240, 135);                                            //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
+WiFiClient client;                                              //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
 
 //----------------Fill in your Wi-Fi / ThingSpeak Credentials-------
 const String ssid = "Wifi Name";                                 //The name of the Wi-Fi network you are connecting to
@@ -46,10 +35,19 @@ Ezo_board* default_board = &device_list[0]; //used to store the board were talki
 //gets the length of the array automatically so we dont have to change the number every time we add new boards
 const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
+//------For version 1.4 use these enable pins for each circuit------
+//const int EN_PH = 13;
+//const int EN_EC = 12;
+//const int EN_RTD = 33;
+//const int EN_AUX = 27;
+//------------------------------------------------------------------
+
+//------For version 1.5 use these enable pins for each circuit------
 const int EN_PH = 12;
-const int EN_EC = 11; 
-const int EN_RTD = 9; 
-const int EN_AUX = 10; 
+const int EN_EC = 27;
+const int EN_RTD = 15;
+const int EN_AUX = 33;
+//------------------------------------------------------------------
 
 const unsigned long reading_delay = 1000;                 //how long we wait to receive a response, in milliseconds
 const unsigned long thingspeak_delay = 15000;             //how long we wait to send values to thingspeak, in milliseconds
@@ -118,21 +116,6 @@ void setup() {
 
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                     //start the serial communication to the computer
-
-  pinMode(TFT_BACKLITE, OUTPUT);
-  digitalWrite(TFT_BACKLITE, HIGH);
-
-  // turn on the TFT / I2C power supply
-  pinMode(TFT_I2C_POWER, OUTPUT);
-  digitalWrite(TFT_I2C_POWER, HIGH);
-  delay(10);
-
-  // initialize TFT
-  tft.init(135, 240); // Init ST7789 240x135
-  tft.setRotation(3);
-  tft.fillScreen(ST77XX_BLACK);
-  canvas.setFont(&FreeSansBold12pt7b);
-  canvas.fillScreen(ST77XX_BLACK);
 
   WiFi.mode(WIFI_STA);                    //set ESP32 mode as a station to be connected to wifi network
   ThingSpeak.begin(client);               //enable ThingSpeak connection
@@ -229,49 +212,6 @@ void step4() {
 
   Serial.println();
   pump_function(PUMP_BOARD, EZO_BOARD, COMPARISON_VALUE, PUMP_DOSE, IS_GREATER_THAN);
-
-  canvas.setCursor(4, 22);
-  canvas.setTextColor(ST77XX_WHITE);
-  canvas.setTextWrap(true);
- 
-  canvas.fillScreen(ST77XX_BLACK);
-  canvas.fillRect(0, 0, 240, 33, 0xea86);
-  
-  canvas.print("pH");
-  canvas.setCursor(70, 22);
-  if (PH.get_error() == Ezo_board::SUCCESS) {                                           //if the PH reading was successful (back in step 1)
-    canvas.print(String(PH.get_last_received_reading()));
-  }else{
-    canvas.print("no data");
-  }
-
-  canvas.setCursor(4, 57);
-  canvas.fillRect(0, 33, 240, 33, 0x1589);
-  canvas.print("EC");
-  canvas.setCursor(70, 57);
-  if (EC.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
-    canvas.print(String(EC.get_last_received_reading(), 0));
-    canvas.print(" uS"); //canvas.println("µS");
-  }else{
-    canvas.print("no data");
-  }
-
-  canvas.setCursor(4, 90);
-  canvas.fillRect(0, 66, 240, 33, 0xbdf8);    
-  canvas.print("RTD");
-  canvas.setCursor(70, 90);
-  if ((RTD.get_error() == Ezo_board::SUCCESS) ) {
-    if (RTD.get_last_received_reading() > -1000.0){
-      canvas.print(String(RTD.get_last_received_reading()));
-      canvas.print(" C"); //canvas.println("°C");
-    }else{
-      canvas.print("no probe");
-    }
-  }else{
-    canvas.print("no data");
-  }
-  tft.drawRGBBitmap(0, 0, canvas.getBuffer(), canvas.width(), canvas.height());
-
 }
 
 

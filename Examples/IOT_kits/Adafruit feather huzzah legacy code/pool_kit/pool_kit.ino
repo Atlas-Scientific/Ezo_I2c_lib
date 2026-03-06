@@ -1,4 +1,4 @@
-//This code is for the Atlas Scientific wifi hydroponics kit that uses the Adafruit ESP32-S3 TFT Feather as its computer.
+//This code is for the Atlas Scientific wifi pool kit that uses the Adafruit huzzah32 as its computer.
 
 #include <iot_cmd.h>
 #include <WiFi.h>                                                //include wifi library 
@@ -9,18 +9,7 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
-#include <SPI.h>
-
-#include <Fonts/FreeSansBold12pt7b.h>
-#include <Fonts/FreeSansBold18pt7b.h>
-
-WiFiClient client;   
-
-// Use dedicated hardware SPI pins
-Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-GFXcanvas16 canvas(240, 135);                                            //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
+WiFiClient client;                                              //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
 
 //----------------Fill in your Wi-Fi / ThingSpeak Credentials-------
 const String ssid = "Wifi Name";                                 //The name of the Wi-Fi network you are connecting to
@@ -29,16 +18,16 @@ const long myChannelNumber = 1234566;                            //Your Thingspe
 const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";                 //Your ThingSpeak Write API Key
 //------------------------------------------------------------------
 
-Ezo_board PH = Ezo_board(99, "PH");       //create a PH circuit object, who's address is 99 and name is "PH"
-Ezo_board EC = Ezo_board(100, "EC");      //create an EC circuit object who's address is 100 and name is "EC"
-Ezo_board RTD = Ezo_board(102, "RTD");    //create an RTD circuit object who's address is 102 and name is "RTD"
-Ezo_board PMP = Ezo_board(103, "PMP");    //create an PMP circuit object who's address is 103 and name is "PMP"
+Ezo_board PH = Ezo_board(99, "PH");           //create a PH circuit object, who's address is 99 and name is "PH"
+Ezo_board ORP = Ezo_board(98, "ORP");         //create an ORP circuit object who's address is 98 and name is "ORP"
+Ezo_board RTD = Ezo_board(102, "RTD");        //create an RTD circuit object who's address is 102 and name is "RTD"
+Ezo_board PMPL = Ezo_board(109, "PMPL");      //create an PMPL circuit object who's address is 109 and name is "PMPL"
 
-Ezo_board device_list[] = {               //an array of boards used for sending commands to all or specific boards
+Ezo_board device_list[] = {   //an array of boards used for sending commands to all or specific boards
   PH,
-  EC,
+  ORP,
   RTD,
-  PMP
+  PMPL
 };
 
 Ezo_board* default_board = &device_list[0]; //used to store the board were talking to
@@ -46,10 +35,11 @@ Ezo_board* default_board = &device_list[0]; //used to store the board were talki
 //gets the length of the array automatically so we dont have to change the number every time we add new boards
 const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
+//enable pins for each circuit
 const int EN_PH = 12;
-const int EN_EC = 11; 
-const int EN_RTD = 9; 
-const int EN_AUX = 10; 
+const int EN_ORP = 27;
+const int EN_RTD = 15;
+const int EN_AUX = 33;
 
 const unsigned long reading_delay = 1000;                 //how long we wait to receive a response, in milliseconds
 const unsigned long thingspeak_delay = 15000;             //how long we wait to send values to thingspeak, in milliseconds
@@ -57,18 +47,18 @@ const unsigned long thingspeak_delay = 15000;             //how long we wait to 
 unsigned int poll_delay = 2000 - reading_delay * 2 - 300; //how long to wait between polls after accounting for the times it takes to send readings
 
 //parameters for setting the pump output
-#define PUMP_BOARD        PMP       //the pump that will do the output (if theres more than one)
-#define PUMP_DOSE         -0.5      //the dose that the pump will dispense in  milliliters
-#define EZO_BOARD         EC        //the circuit that will be the target of comparison
+#define PUMP_BOARD        PMPL      //the pump that will do the output (if theres more than one)
+#define PUMP_DOSE         10        //the dose that the pump will dispense in  milliliters
+#define EZO_BOARD         PH        //the circuit that will be the target of comparison
 #define IS_GREATER_THAN   true      //true means the circuit's reading has to be greater than the comparison value, false mean it has to be less than
-#define COMPARISON_VALUE  1000      //the threshold above or below which the pump is activated
+#define COMPARISON_VALUE  7         //the threshold above or below which the pump is activated
 
 float k_val = 0;                                          //holds the k value for determining what to print in the help menu
 
 bool polling  = true;                                     //variable to determine whether or not were polling the circuits
 bool send_to_thingspeak = true;                           //variable to determine whether or not were sending data to thingspeak
 
-bool wifi_isconnected() {                                 //function to check if wifi is connected
+bool wifi_isconnected() {                           //function to check if wifi is connected
   return (WiFi.status() == WL_CONNECTED);
 }
 
@@ -80,7 +70,7 @@ void reconnect_wifi() {                                   //function to reconnec
 }
 
 void thingspeak_send() {
-  if (send_to_thingspeak == true) {                                                      //if we're datalogging
+  if (send_to_thingspeak == true) {                                                    //if we're datalogging
     if (wifi_isconnected()) {
       int return_code = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
       if (return_code == 200) {                                                          //code for successful transmission
@@ -108,31 +98,16 @@ Sequencer1 Thingspeak_seq(&thingspeak_send, thingspeak_delay); //sends data to t
 void setup() {
 
   pinMode(EN_PH, OUTPUT);                                                         //set enable pins as outputs
-  pinMode(EN_EC, OUTPUT);
+  pinMode(EN_ORP, OUTPUT);
   pinMode(EN_RTD, OUTPUT);
   pinMode(EN_AUX, OUTPUT);
   digitalWrite(EN_PH, LOW);                                                       //set enable pins to enable the circuits
-  digitalWrite(EN_EC, LOW);
+  digitalWrite(EN_ORP, LOW);
   digitalWrite(EN_RTD, HIGH);
   digitalWrite(EN_AUX, LOW);
 
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                     //start the serial communication to the computer
-
-  pinMode(TFT_BACKLITE, OUTPUT);
-  digitalWrite(TFT_BACKLITE, HIGH);
-
-  // turn on the TFT / I2C power supply
-  pinMode(TFT_I2C_POWER, OUTPUT);
-  digitalWrite(TFT_I2C_POWER, HIGH);
-  delay(10);
-
-  // initialize TFT
-  tft.init(135, 240); // Init ST7789 240x135
-  tft.setRotation(3);
-  tft.fillScreen(ST77XX_BLACK);
-  canvas.setFont(&FreeSansBold12pt7b);
-  canvas.fillScreen(ST77XX_BLACK);
 
   WiFi.mode(WIFI_STA);                    //set ESP32 mode as a station to be connected to wifi network
   ThingSpeak.begin(client);               //enable ThingSpeak connection
@@ -142,7 +117,7 @@ void setup() {
 }
 
 void loop() {
-  String cmd;                             //variable to hold commands we send to the kit
+  String cmd;                            //variable to hold commands we send to the kit
 
   Wifi_Seq.run();                        //run the sequncer to do the polling
 
@@ -182,7 +157,7 @@ void pump_function(Ezo_board &pump, Ezo_board &sensor, float value, float dose, 
       }
       Serial.println(response);
     } else {
-      pump.send_cmd("x");                                           //if we're not supposed to dispense, stop the pump
+      pump.send_cmd("x");                                          //if we're not supposed to dispense, stop the pump
     }
   }
 }
@@ -198,11 +173,9 @@ void step2() {
 
   if ((RTD.get_error() == Ezo_board::SUCCESS) && (RTD.get_last_received_reading() > -1000.0)) { //if the temperature reading has been received and it is valid
     PH.send_cmd_with_num("T,", RTD.get_last_received_reading());
-    EC.send_cmd_with_num("T,", RTD.get_last_received_reading());
-    ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                         //assign temperature readings to the third column of thingspeak channel
+    ThingSpeak.setField(3, String(RTD.get_last_received_reading(), 2));                 //assign temperature readings to the third column of thingspeak channel
   } else {                                                                                      //if the temperature reading is invalid
     PH.send_cmd_with_num("T,", 25.0);                                                           //send default temp = 25 deg C to PH sensor
-    EC.send_cmd_with_num("T,", 25.0);
     ThingSpeak.setField(3, String(25.0, 2));                 //assign temperature readings to the third column of thingspeak channel
   }
 
@@ -213,68 +186,22 @@ void step3() {
   //send a read command. we use this command instead of PH.send_cmd("R");
   //to let the library know to parse the reading
   PH.send_read_cmd();
-  EC.send_read_cmd();
+  ORP.send_read_cmd();
 }
 
 void step4() {
   receive_and_print_reading(PH);             //get the reading from the PH circuit
-  if (PH.get_error() == Ezo_board::SUCCESS) {                                           //if the PH reading was successful (back in step 1)
+  if (PH.get_error() == Ezo_board::SUCCESS) {                                          //if the PH reading was successful (back in step 1)
     ThingSpeak.setField(1, String(PH.get_last_received_reading(), 2));                 //assign PH readings to the first column of thingspeak channel
   }
   Serial.print("  ");
-  receive_and_print_reading(EC);             //get the reading from the EC circuit
-  if (EC.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
-    ThingSpeak.setField(2, String(EC.get_last_received_reading(), 0));                 //assign EC readings to the second column of thingspeak channel
+  receive_and_print_reading(ORP);             //get the reading from the ORP circuit
+  if (ORP.get_error() == Ezo_board::SUCCESS) {                                          //if the ORP reading was successful (back in step 1)
+    ThingSpeak.setField(2, String(ORP.get_last_received_reading(), 0));                 //assign ORP readings to the second column of thingspeak channel
   }
-
   Serial.println();
   pump_function(PUMP_BOARD, EZO_BOARD, COMPARISON_VALUE, PUMP_DOSE, IS_GREATER_THAN);
-
-  canvas.setCursor(4, 22);
-  canvas.setTextColor(ST77XX_WHITE);
-  canvas.setTextWrap(true);
- 
-  canvas.fillScreen(ST77XX_BLACK);
-  canvas.fillRect(0, 0, 240, 33, 0xea86);
-  
-  canvas.print("pH");
-  canvas.setCursor(70, 22);
-  if (PH.get_error() == Ezo_board::SUCCESS) {                                           //if the PH reading was successful (back in step 1)
-    canvas.print(String(PH.get_last_received_reading()));
-  }else{
-    canvas.print("no data");
-  }
-
-  canvas.setCursor(4, 57);
-  canvas.fillRect(0, 33, 240, 33, 0x1589);
-  canvas.print("EC");
-  canvas.setCursor(70, 57);
-  if (EC.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
-    canvas.print(String(EC.get_last_received_reading(), 0));
-    canvas.print(" uS"); //canvas.println("µS");
-  }else{
-    canvas.print("no data");
-  }
-
-  canvas.setCursor(4, 90);
-  canvas.fillRect(0, 66, 240, 33, 0xbdf8);    
-  canvas.print("RTD");
-  canvas.setCursor(70, 90);
-  if ((RTD.get_error() == Ezo_board::SUCCESS) ) {
-    if (RTD.get_last_received_reading() > -1000.0){
-      canvas.print(String(RTD.get_last_received_reading()));
-      canvas.print(" C"); //canvas.println("°C");
-    }else{
-      canvas.print("no probe");
-    }
-  }else{
-    canvas.print("no data");
-  }
-  tft.drawRGBBitmap(0, 0, canvas.getBuffer(), canvas.width(), canvas.height());
-
 }
-
-
 
 void start_datalogging() {
   polling = true;                                                 //set poll to true to start the polling loop
@@ -311,18 +238,8 @@ bool process_coms(const String &string_buffer) {      //function to process comm
   return false;                         //return false if the command is not in the list, so we can scan the other list or pass it to the circuit
 }
 
-void get_ec_k_value() {                                   //function to query the value of the ec circuit
-  char rx_buf[10];                                        //buffer to hold the string we receive from the circuit
-  EC.send_cmd("k,?");                                     //query the k value
-  delay(300);
-  if (EC.receive_cmd(rx_buf, 10) == Ezo_board::SUCCESS) { //if the reading is successful
-    k_val = String(rx_buf).substring(3).toFloat();        //parse the reading into a float
-  }
-}
-
 void print_help() {
-  get_ec_k_value();
-  Serial.println(F("Atlas Scientific I2C hydroponics kit                                       "));
+  Serial.println(F("Atlas Scientific I2C pool kit                                              "));
   Serial.println(F("Commands:                                                                  "));
   Serial.println(F("datalog      Takes readings of all sensors every 15 sec send to thingspeak "));
   Serial.println(F("             Entering any commands stops datalog mode.                     "));
@@ -333,26 +250,8 @@ void print_help() {
   Serial.println(F("ph:cal,high,10   calibrate to pH 10                                        "));
   Serial.println(F("ph:cal,clear     clear calibration                                         "));
   Serial.println(F("                                                                           "));
-  Serial.println(F("ec:cal,dry           calibrate a dry EC probe                              "));
-  Serial.println(F("ec:k,[n]             used to switch K values, standard probes values are 0.1, 1, and 10 "));
-  Serial.println(F("ec:cal,clear         clear calibration                                     "));
-
-  if (k_val > 9) {
-    Serial.println(F("For K10 probes, these are the recommended calibration values:            "));
-    Serial.println(F("  ec:cal,low,12880     calibrate EC probe to 12,880us                    "));
-    Serial.println(F("  ec:cal,high,150000   calibrate EC probe to 150,000us                   "));
-  }
-  else if (k_val > .9) {
-    Serial.println(F("For K1 probes, these are the recommended calibration values:             "));
-    Serial.println(F("  ec:cal,low,12880     calibrate EC probe to 12,880us                    "));
-    Serial.println(F("  ec:cal,high,80000    calibrate EC probe to 80,000us                    "));
-  }
-  else if (k_val > .09) {
-    Serial.println(F("For K0.1 probes, these are the recommended calibration values:           "));
-    Serial.println(F("  ec:cal,low,84        calibrate EC probe to 84us                        "));
-    Serial.println(F("  ec:cal,high,1413     calibrate EC probe to 1413us                      "));
-  }
-
+  Serial.println(F("orp:cal,225          calibrate orp probe to 225mV                          "));
+  Serial.println(F("orp:cal,clear        clear calibration                                     "));
   Serial.println(F("                                                                           "));
   Serial.println(F("rtd:cal,t            calibrate the temp probe to any temp value            "));
   Serial.println(F("                     t= the temperature you have chosen                    "));

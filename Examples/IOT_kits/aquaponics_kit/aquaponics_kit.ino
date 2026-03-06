@@ -7,7 +7,18 @@
 #include <Ezo_i2c.h> //include the EZO I2C library from https://github.com/Atlas-Scientific/Ezo_I2c_lib
 #include <Wire.h>    //include arduinos i2c library
 
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <SPI.h>
+
+#include <Fonts/FreeSansBold12pt7b.h>
+#include <Fonts/FreeSansBold18pt7b.h>
+
 WiFiClient client;                                              //declare that this device connects to a Wi-Fi network,create a connection to a specified internet IP address
+
+// Use dedicated hardware SPI pins
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+GFXcanvas16 canvas(240, 135);  
 
 //----------------Fill in your Wi-Fi / ThingSpeak Credentials-------
 const String ssid = "Wifi Name";                                 //The name of the Wi-Fi network you are connecting to
@@ -22,7 +33,7 @@ Ezo_board RTD = Ezo_board(102, "RTD");    //create an RTD circuit object who's a
 Ezo_board EC = Ezo_board(100, "EC");      //create an EC circuit object who's address is 100 and name is "EC"
 Ezo_board PMP = Ezo_board(103, "PMP");    //create an PMP circuit object who's address is 103 and name is "PMP"
 Ezo_board HUM = Ezo_board(111, "HUM");    //create a HUM circuit object who's address is 111 and name is "HUM"
-Ezo_board CO2 = Ezo_board(105, "CO2");    //create a CO2 circuit object who's address is 105 and name is "CO2"
+Ezo_board CO2 = Ezo_board(113, "CO2E");    //create a CO2E circuit object who's address is 113 and name is "CO2E"
 
 Ezo_board device_list[] = {               //an array of boards used for sending commands to all or specific boards
   PH,
@@ -40,24 +51,12 @@ Ezo_board* default_board = &device_list[0]; //used to store the board were talki
 const uint8_t device_list_len = sizeof(device_list) / sizeof(device_list[0]);
 
 //enable pins for each circuit
-//------For board version 1.7 use these enable pins for each circuit------
-//const int EN_PH = 13;
-//const int EN_DO = 12;
-//const int EN_RTD = 33;
-//const int EN_EC = 27;
-//const int EN_HUM = 32;
-//const int EN_CO2 = 15;
-//------------------------------------------------------------------
-
-//------For board version 1.8 use these enable pins for each circuit------
 const int EN_PH = 12;
-const int EN_DO = 27;
-const int EN_RTD = 15;
-const int EN_EC = 33;
-const int EN_HUM = 14;
-const int EN_CO2 = 32;
-//------------------------------------------------------------------
-
+const int EN_DO = 11; 
+const int EN_RTD = 9; 
+const int EN_EC = 10; 
+const int EN_HUM = 6;
+const int EN_CO2 = 5;
 
 const unsigned long reading_delay = 1000;                   //how long we wait to receive a response, in milliseconds
 const unsigned long thingspeak_delay = 15000;               //how long we wait to send values to thingspeak, in milliseconds
@@ -101,6 +100,13 @@ void thingspeak_send() {
   }
 }
 
+uint16_t left_align_offset(String text) {
+  int16_t x, y;
+  uint16_t w, h;
+  canvas.getTextBounds(text, 0, 0, &x, &y, &w, &h);
+  return w;
+}
+
 void step1();     //forward declarations of functions to use them in the sequencer before defining them
 void step2();
 void step3();
@@ -130,9 +136,23 @@ void setup() {
   digitalWrite(EN_HUM, HIGH);
   digitalWrite(EN_CO2, HIGH);
 
-
   Wire.begin();                           //start the I2C
   Serial.begin(9600);                     //start the serial communication to the computer
+
+  pinMode(TFT_BACKLITE, OUTPUT);
+  digitalWrite(TFT_BACKLITE, HIGH);
+
+  // turn on the TFT / I2C power supply
+  pinMode(TFT_I2C_POWER, OUTPUT);
+  digitalWrite(TFT_I2C_POWER, HIGH);
+  delay(10);
+
+  // initialize TFT
+  tft.init(135, 240); // Init ST7789 240x135
+  tft.setRotation(3);
+  tft.fillScreen(ST77XX_BLACK);
+  canvas.setFont(&FreeSansBold12pt7b);
+  canvas.fillScreen(ST77XX_BLACK);
 
   WiFi.mode(WIFI_STA);                    //set ESP32 mode as a station to be connected to wifi network
   ThingSpeak.begin(client);               //enable ThingSpeak connection
@@ -251,6 +271,91 @@ void step4() {
 
   Serial.println();
   pump_function(PUMP_BOARD, EZO_BOARD, COMPARISON_VALUE, PUMP_DOSE, IS_GREATER_THAN);
+
+  canvas.setCursor(4, 22);
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.setTextWrap(true);
+ 
+  canvas.fillScreen(ST77XX_BLACK);
+  canvas.fillRect(0, 0, 240, 33, 0xea86);
+  
+  canvas.print("pH");
+  canvas.setCursor(60, 22);
+  if (PH.get_error() == Ezo_board::SUCCESS) {                                           //if the PH reading was successful (back in step 1)
+    canvas.print(String(PH.get_last_received_reading()));
+  }else{
+    canvas.print("no data");
+  }
+
+  canvas.setCursor(4, 57);
+  canvas.fillRect(0, 33, 240, 33, 0xfe80);
+  canvas.setTextColor(ST77XX_BLACK);   
+  canvas.print("DO");
+  canvas.setCursor(60, 57);
+  if (DO.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
+    canvas.print(String(DO.get_last_received_reading(), 0));
+    canvas.print(" mg/l");
+  }else{
+    canvas.print("no data");
+  }
+
+  canvas.setCursor(4, 90);
+  canvas.fillRect(0, 66, 240, 33, 0xbdf8); 
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.print("RTD");
+  canvas.setCursor(60, 90);
+  if ((RTD.get_error() == Ezo_board::SUCCESS) ) {
+    if (RTD.get_last_received_reading() > -1000.0){
+      canvas.print(String(RTD.get_last_received_reading()));
+      canvas.print(" C"); //canvas.println("°C");
+    }else{
+      canvas.print("no probe");
+    }
+  }else{
+    canvas.print("no data");
+  }
+
+  canvas.setCursor(4, 123);
+  canvas.fillRect(0, 99, 240, 33, 0x1589);
+  canvas.print("EC");
+  canvas.setCursor(60, 123);
+  if (EC.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
+    canvas.print(String(EC.get_last_received_reading(), 0));
+    canvas.print(" uS");  //canvas.println("µS");
+  }else{
+    canvas.print("no data");
+  }
+  
+
+  canvas.setCursor(179, 22);
+  canvas.fillRect(175, 0, 75, 66, 0xeb24 );
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.print("CO2");
+  canvas.setCursor(175, 57);
+  if (CO2.get_error() == Ezo_board::SUCCESS) {                                           //if the EC reading was successful (back in step 1)
+    String CO2_data = String(CO2.get_last_received_reading(), 0);
+    canvas.setCursor(230 - left_align_offset(CO2_data), 57);
+    canvas.print(CO2_data);
+  }else{
+    canvas.print("err");
+  }
+
+  canvas.setCursor(179, 90);
+  canvas.fillRect(175, 66, 75, 66, 0x55d0);
+  canvas.print("HUM");
+  canvas.setCursor(175, 123);
+  if (HUM.get_error() == Ezo_board::SUCCESS) {
+    String Hum_data = String(HUM.get_last_received_reading(), 0);
+    canvas.setCursor(210 - left_align_offset(Hum_data), 123);
+    canvas.print(Hum_data);
+    canvas.print("%");
+  }else{
+    canvas.print("err");
+  }
+
+  canvas.writeLine(175,0, 175, 135, 0x5acb);
+
+  tft.drawRGBBitmap(0, 0, canvas.getBuffer(), canvas.width(), canvas.height());
 }
 
 
